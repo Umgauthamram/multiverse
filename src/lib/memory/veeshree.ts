@@ -6,6 +6,8 @@
  * Reference: https://veeshree.vercel.app/
  */
 
+import { env } from "@/lib/env";
+
 export interface UserPersonaMemory {
   userId: string;
   corePriorities: string[];
@@ -32,11 +34,8 @@ export class VeeshreeClient {
   private apiKey?: string;
 
   constructor(baseUrl?: string, apiKey?: string) {
-    this.baseUrl =
-      baseUrl ||
-      process.env.VEESHREE_API_URL ||
-      "https://veeshree.vercel.app/api";
-    this.apiKey = apiKey || process.env.VEESHREE_API_KEY;
+    this.baseUrl = baseUrl || env.VEESHREE_API_URL;
+    this.apiKey = apiKey || env.VEESHREE_API_KEY;
   }
 
   /**
