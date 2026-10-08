@@ -1,0 +1,86 @@
+{
+  "last_updated": "2026-10-08T05:37:37.772Z",
+  "documents": [
+    {
+      "id": "doc-docs-memory-constraints-md",
+      "path": "docs/memory/constraints.md",
+      "title": "Architectural & Security Constraints",
+      "type": "constraints",
+      "status": "active",
+      "tags": [],
+      "linked_files": [],
+      "linked_hashes": {},
+      "stale": false,
+      "content": "# Architectural & Security Constraints\n\n## Hard Constraints (Never Violate)\n- **Zero Opaque Lock-in**: Project memory must reside in human-readable Markdown inside `docs/memory/`.\n- **Token Budget Discipline**: Injected context payloads must strictly adhere to token allocations.\n- **Pure JavaScript / Zero Native C++**: CLI dependencies must run across Node.js without native build toolchains.\n\n## Soft Guidelines (Best Practices)\n- Prefer explicit architectural decision records (ADRs) before implementing major refactors.\n- Keep source code files linked to corresponding decision records in frontmatter (`linked_files`).",
+      "last_modified": "2026-10-08T05:37:37.758Z"
+    },
+    {
+      "id": "doc-docs-memory-current-state-md",
+      "path": "docs/memory/current-state.md",
+      "title": "Current Project State",
+      "type": "state",
+      "status": "active",
+      "tags": [],
+      "linked_files": [],
+      "linked_hashes": {},
+      "stale": false,
+      "content": "# Current Project State\n\n## 1. System Overview & Purpose\n- **Project Name**: multiverse-you\n- **Active Branch**: `main`\n- **Detected Stack & Architecture**:\n- **Primary Purpose**: This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). First, run the development server:\n- **Languages**: JavaScript / TypeScript\n- **Frameworks / Libraries**: Next.js, React\n- **Infrastructure & Tools**: Tailwind CSS, Environment Variables Configured\n\n## 2. Active Feature / Milestone\n- **Current Focus**: Core Architecture & Feature Development\n- **Status**: In Progress\n\n## 3. Recent Progress (Rolling Snapshot - Max 5)\n- Next.js 15 & Poppins Typography Initialization\n- project structuring by phases\n- project structuring\n- first commit\n\n## 4. Next Immediate Steps\n- [ ] Define initial architectural constraints in `docs/memory/constraints.md`\n- [ ] Record key architectural decision records in `docs/memory/decisions/`\n- [ ] Set active development goals in `docs/memory/tasks.md`",
+      "last_modified": "2026-10-08T05:37:37.758Z"
+    },
+    {
+      "id": "doc-docs-memory-decisions-framework-md",
+      "path": "docs/memory/decisions/framework.md",
+      "title": "Application Framework",
+      "type": "decision",
+      "status": "active",
+      "tags": [
+        "framework",
+        "architecture"
+      ],
+      "linked_files": [],
+      "linked_hashes": {},
+      "stale": false,
+      "content": "# Application Framework\n\n## Context & Problem Statement\nSelection and architecture of framework for the project.\n\n## Decision\n[Pending AI Observation] Detected: Next.js, React.\n\n## Rationale\nCaptured automatically during initial repository scan. Detailed trade-offs and alternatives to be recorded as development proceeds.\n\n## Alternatives Considered\n- Standard alternative evaluated during planning.\n\n## Consequences & Linked Files\n- Linked Source Files: None yet specified.",
+      "last_modified": "2026-10-08T05:37:37.761Z"
+    },
+    {
+      "id": "doc-docs-memory-discoveries-md",
+      "path": "docs/memory/discoveries.md",
+      "title": "System Behaviors & Discoveries",
+      "type": "discoveries",
+      "status": "active",
+      "tags": [],
+      "linked_files": [],
+      "linked_hashes": {},
+      "stale": false,
+      "content": "# System Behaviors & Discoveries\n\n## Key Technical Discoveries\n*This file documents unexpected system behaviors, performance quirks, and technical findings uncovered during development.*\n\n- **Repository Initialized**: Bootstrapped with Veeshree context persistence layer.",
+      "last_modified": "2026-10-08T05:37:37.758Z"
+    },
+    {
+      "id": "doc-docs-memory-rejected-md",
+      "path": "docs/memory/rejected.md",
+      "title": "Rejected Approaches & Trade-Offs",
+      "type": "rejected",
+      "status": "active",
+      "tags": [],
+      "linked_files": [],
+      "linked_hashes": {},
+      "stale": false,
+      "content": "# Rejected Approaches & Trade-Offs\n\n## Rejected Alternatives\n*This file records explicitly evaluated and discarded architectural choices to prevent future AI agents from re-proposing rejected approaches.*\n\n### Example Entry\n- **Approach**: Heavy Native Vector Database (e.g. native C++ bindings for local vector store)\n- **Reason Rejected**: Introduces platform-specific compilation errors and heavy installation dependencies on client machines. Chosen alternative: pure JS `minisearch` with zero native dependencies.",
+      "last_modified": "2026-10-08T05:37:37.758Z"
+    },
+    {
+      "id": "doc-docs-memory-tasks-md",
+      "path": "docs/memory/tasks.md",
+      "title": "Project Tasks & Milestones",
+      "type": "tasks",
+      "status": "active",
+      "tags": [],
+      "linked_files": [],
+      "linked_hashes": {},
+      "stale": false,
+      "content": "# Project Tasks & Milestones\n\n## Active Tasks\n- [ ] Bootstrap foundational architecture & core dependencies\n- [ ] Configure environment variables & local development setup\n- [ ] Implement initial core features\n\n## Backlog\n- [ ] Set up testing suite and continuous integration\n- [ ] Document production deployment & infrastructure guidelines",
+      "last_modified": "2026-10-08T05:37:37.758Z"
+    }
+  ]
+}

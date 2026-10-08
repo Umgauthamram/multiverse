@@ -1,0 +1,9 @@
+# Veeshree Context Persistence Rules for Cursor
+
+You are operating within a repository utilizing Veeshree for persistent project context.
+Before making architectural recommendations or modifying code:
+1. Review active architectural constraints in `docs/memory/constraints.md`.
+2. Inspect active architectural decisions in `docs/memory/decisions/`.
+3. Check current milestone progress in `docs/memory/current-state.md` and `docs/memory/tasks.md`.
+4. Never suggest or re-implement approaches recorded in `docs/memory/rejected.md`.
+5. When completing or implementing a feature, update `docs/memory/current-state.md` and mark completed tasks in `docs/memory/tasks.md`.

@@ -1,0 +1,21 @@
+{
+  "version": "0.1.0",
+  "default_extractor": {
+    "provider": "gemini",
+    "model": "gemini-2.5-flash"
+  },
+  "keys": {
+    "openai": "",
+    "anthropic": "",
+    "gemini": ""
+  },
+  "local_engine": {
+    "enabled": false,
+    "port": 11434,
+    "model": "llama3"
+  },
+  "settings": {
+    "max_context_tokens": 2000,
+    "auto_sync_on_commit": true
+  }
+}
