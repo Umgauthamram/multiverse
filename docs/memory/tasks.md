@@ -14,8 +14,10 @@
 
 - [x] Phase 11: Weighted random life event roller in `src/lib/simulation/eventRoller.ts`
 
+- [x] Phase 12: Decision intake form & Zod schema definition in `src/lib/schemas/intake.ts`
+
 ## Active Tasks
-- [ ] Phase 12: Decision intake form & Zod schema definition
+- [ ] Phase 13: Voice-to-Text input via Web Speech API & Whisper fallback
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
