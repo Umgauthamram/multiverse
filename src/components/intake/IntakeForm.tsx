@@ -7,6 +7,7 @@ import {
   validateIntakeInput,
   CorePriority,
 } from "@/lib/schemas/intake";
+import { VoiceInput } from "./VoiceInput";
 
 interface IntakeFormProps {
   initialValues?: Partial<IntakeFormValues>;
@@ -474,7 +475,12 @@ export function IntakeForm({
           <div className="space-y-4">
             <p className="text-xs text-zinc-400 leading-relaxed">
               State your real-world dilemma clearly. What decision are you struggling with?
+              You can speak your dilemma or type it below.
             </p>
+
+            <VoiceInput
+              onTranscript={(transcript) => updateField("decisionPrompt", transcript)}
+            />
 
             <div>
               <textarea

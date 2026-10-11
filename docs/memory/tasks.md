@@ -16,8 +16,10 @@
 
 - [x] Phase 12: Decision intake form & Zod schema definition in `src/lib/schemas/intake.ts`
 
+- [x] Phase 13: Voice-to-Text input via Web Speech API & Whisper fallback in `src/components/intake/VoiceInput.tsx`
+
 ## Active Tasks
-- [ ] Phase 13: Voice-to-Text input via Web Speech API & Whisper fallback
+- [ ] Phase 14: World-Builder Agent (NVIDIA NIM) in `src/lib/ai/agents/worldBuilder.ts`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
