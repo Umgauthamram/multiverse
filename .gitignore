@@ -36,3 +36,9 @@ Thumbs.db
 # Upstash & Local DB scratch
 .upstash
 /scratch
+
+
+# Veeshree local config & secrets
+/.vee/config.json
+/.vee/index.json
+.env

@@ -1,18 +1,18 @@
 {
-  "last_updated": "2026-10-08T05:37:37.772Z",
+  "last_updated": "2026-10-11T11:57:34.192Z",
   "documents": [
     {
       "id": "doc-docs-memory-constraints-md",
       "path": "docs/memory/constraints.md",
-      "title": "Architectural & Security Constraints",
+      "title": "System Constraints & Invariants",
       "type": "constraints",
       "status": "active",
       "tags": [],
       "linked_files": [],
       "linked_hashes": {},
       "stale": false,
-      "content": "# Architectural & Security Constraints\n\n## Hard Constraints (Never Violate)\n- **Zero Opaque Lock-in**: Project memory must reside in human-readable Markdown inside `docs/memory/`.\n- **Token Budget Discipline**: Injected context payloads must strictly adhere to token allocations.\n- **Pure JavaScript / Zero Native C++**: CLI dependencies must run across Node.js without native build toolchains.\n\n## Soft Guidelines (Best Practices)\n- Prefer explicit architectural decision records (ADRs) before implementing major refactors.\n- Keep source code files linked to corresponding decision records in frontmatter (`linked_files`).",
-      "last_modified": "2026-10-08T05:37:37.758Z"
+      "content": "# System Constraints & Invariants\n\n## 1. Architectural Constraints\n- **Zero-Token Math Rule**: Never use LLMs for financial arithmetic, compounding, or running balance tracking. All currency and runway accounting must be computed deterministically in code.\n- **Statistical Invariants**: Player psychological metrics (`happiness`, `health`, `relationships`, `career`) must remain strictly clamped within `[0, 100]`.\n- **Token Optimization**: Simulation turns must run in 3-month quarterly blocks (20 steps per timeline) returning only delta JSON objects (`< 80` tokens per step).\n- **Multi-Provider Fallback**: Calls must route through `src/lib/ai/router.ts`. HTTP 429 rate limits or transient errors must automatically fall back across the provider chain without dropping user session state.\n- **Serverless Database Safety**: MongoDB connections must use the cached singleton in `src/lib/db/mongodb.ts` to prevent connection exhaustion during Next.js serverless execution.\n\n## 2. Design & Aesthetic Constraints (Anti-AI-Slop Manifesto)\n- **Typography**: Google Font `Poppins` must be used for all headings, labels, and badges.\n- **Color Palette**: Restrained dark warm slate (`#09090b` / `#121215`) with functional status accents (Emerald for thriving, Amber for plateau, Crimson for crisis, Slate for terminated).\n- **Prohibited Clichés**: No generic purple/cyan gradient overlays, no sparkle emojis/icons, no floating blurred orbs, and no fake marketing testimonials.\n- **Framing Invariant**: The UI and prompts must always state: *\"Reflective Simulation Engine, Not a Future Prediction\"*.",
+      "last_modified": "2026-10-11T11:57:05.664Z"
     },
     {
       "id": "doc-docs-memory-current-state-md",
@@ -24,8 +24,21 @@
       "linked_files": [],
       "linked_hashes": {},
       "stale": false,
-      "content": "# Current Project State\n\n## 1. System Overview & Purpose\n- **Project Name**: multiverse-you\n- **Active Branch**: `main`\n- **Detected Stack & Architecture**:\n- **Primary Purpose**: This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). First, run the development server:\n- **Languages**: JavaScript / TypeScript\n- **Frameworks / Libraries**: Next.js, React\n- **Infrastructure & Tools**: Tailwind CSS, Environment Variables Configured\n\n## 2. Active Feature / Milestone\n- **Current Focus**: Core Architecture & Feature Development\n- **Status**: In Progress\n\n## 3. Recent Progress (Rolling Snapshot - Max 5)\n- Next.js 15 & Poppins Typography Initialization\n- project structuring by phases\n- project structuring\n- first commit\n\n## 4. Next Immediate Steps\n- [ ] Define initial architectural constraints in `docs/memory/constraints.md`\n- [ ] Record key architectural decision records in `docs/memory/decisions/`\n- [ ] Set active development goals in `docs/memory/tasks.md`",
-      "last_modified": "2026-10-08T05:37:37.758Z"
+      "content": "# Current Project State\n\n## 1. System Overview & Purpose\n- **Project Name**: multiverse-you\n- **Active Branch**: `main`\n- **Detected Stack & Architecture**:\n  - Fullstack Framework: Next.js 15 (App Router, TypeScript)\n  - Styling & Design: Tailwind CSS v4, Poppins Google Font, Anti-AI-Slop restrained dark palette\n  - Database: MongoDB Atlas (connection pool singleton in `src/lib/db/mongodb.ts`)\n  - Concurrency & Lock Layer: Upstash Redis REST + Lua script locks in `src/lib/redis/client.ts`\n  - Multi-Provider AI: Vercel AI SDK with Groq (Llama 3.1/3.3), NVIDIA NIM (Llama 70B), Google Gemini (2.5 Flash)\n  - Resilient LLM Router: Automatic 429/5xx fallback chain in `src/lib/ai/router.ts`\n  - Memory Layer: Veeshree Client integration in `src/lib/memory/veeshree.ts`\n  - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)\n\n## 2. Active Feature / Milestone\n- **Current Focus**: Simulation Engines & Algorithmic Foundation (Phases 9–11)\n- **Status**: Ready for Phase 9 (Zero-Token Financial Calculation Engine)\n\n## 3. Recent Progress (Rolling Snapshot - Max 5)\n- Phase 7: Resilient LLM Router with automatic fallback & telemetry (`src/lib/ai/router.ts`)\n- Phase 6: Vercel AI SDK multi-provider matrix setup (`src/lib/ai/providers.ts`)\n- Phase 5: Upstash Redis client with distributed Lua lock engine (`src/lib/redis/client.ts`)\n- Phase 4: Serverless MongoDB Atlas client singleton (`src/lib/db/mongodb.ts`)\n- Phase 8: Veeshree memory layer client (`src/lib/memory/veeshree.ts`)\n\n## 4. Next Immediate Steps\n- [ ] Implement `src/lib/simulation/financeEngine.ts` (Phase 9)\n- [ ] Implement statistical boundary clamping & burnout trigger (Phase 10)\n- [ ] Implement calibrated weighted random life event roller (Phase 11)",
+      "last_modified": "2026-10-11T11:56:53.550Z"
+    },
+    {
+      "id": "doc-docs-memory-decisions-adr-002-multi-provider-resilience-md",
+      "path": "docs/memory/decisions/adr-002-multi-provider-resilience.md",
+      "title": "ADR 002: Multi-Model AI Routing & Tri-Provider Fallback Architecture",
+      "type": "decision",
+      "status": "active",
+      "tags": [],
+      "linked_files": [],
+      "linked_hashes": {},
+      "stale": false,
+      "content": "# ADR 002: Multi-Model AI Routing & Tri-Provider Fallback Architecture\n\n## Context\nMultiverse You simulates 12 parallel timelines across 5 years (20 quarterly steps each = 240 calls). Free-tier or low-tier quotas on any single provider (like Groq's 30 RPM limit or NVIDIA's request limits) are susceptible to HTTP 429 rate limits. Furthermore, different providers have distinct strengths: Groq generates tokens at extreme speeds (~500+ tok/s), NVIDIA NIM provides deep creative persona framing, and Google Gemini possesses a 1M+ token context window capable of reading all 12 timelines simultaneously.\n\n## Decision\nWe implemented a multi-provider router in `src/lib/ai/router.ts` backed by Vercel AI SDK (`@ai-sdk/openai`, `@ai-sdk/google`):\n1. **Groq (`llama-3.1-8b-instant`)**: Primary driver for high-frequency quarterly life simulation steps.\n2. **NVIDIA NIM (`meta/llama-3.1-70b-instruct`)**: Primary driver for creative persona profiling and world building.\n3. **Google Gemini (`gemini-2.5-flash`)**: Primary driver for cross-timeline narrator synthesis.\n4. **Resilient Failover**: If any primary provider returns HTTP 429 or 5xx, the router automatically fails over to the next provider in the chain without dropping user session state.\n\n## Status\nAccepted and verified with automated test suites (`tests/unit/router.test.ts`).",
+      "last_modified": "2026-10-11T11:57:22.428Z"
     },
     {
       "id": "doc-docs-memory-decisions-framework-md",
@@ -79,8 +92,8 @@
       "linked_files": [],
       "linked_hashes": {},
       "stale": false,
-      "content": "# Project Tasks & Milestones\n\n## Active Tasks\n- [ ] Bootstrap foundational architecture & core dependencies\n- [ ] Configure environment variables & local development setup\n- [ ] Implement initial core features\n\n## Backlog\n- [ ] Set up testing suite and continuous integration\n- [ ] Document production deployment & infrastructure guidelines",
-      "last_modified": "2026-10-08T05:37:37.758Z"
+      "content": "# Project Tasks & Milestones\n\n## Completed Tasks\n- [x] Phase 1: Next.js 15 App Router, Poppins typography, and dark restrained landing page\n- [x] Phase 2: Runtime environment validation schema with Zod in `src/lib/env.ts`\n- [x] Phase 3: Automated GitHub Actions CI/CD pipeline (`.github/workflows/ci.yml`) and local `npm run ci`\n- [x] Phase 4: Serverless MongoDB Atlas client singleton and connection pool in `src/lib/db/mongodb.ts`\n- [x] Phase 5: Upstash Redis REST client and distributed atomic lock engine in `src/lib/redis/client.ts`\n- [x] Phase 6: Vercel AI SDK multi-provider matrix (Groq, NVIDIA NIM, Gemini) in `src/lib/ai/providers.ts`\n- [x] Phase 7: Resilient LLM Router with automatic fallback and telemetry in `src/lib/ai/router.ts`\n- [x] Phase 8: Veeshree memory layer integration client in `src/lib/memory/veeshree.ts`\n\n## Active Tasks\n- [ ] Phase 9: Zero-token financial calculation engine in `src/lib/simulation/financeEngine.ts`\n- [ ] Phase 10: Statistical clamping and burnout invariant engine in `src/lib/simulation/statClamper.ts`\n- [ ] Phase 11: Weighted random life event roller in `src/lib/simulation/eventRoller.ts`\n- [ ] Phase 12: Decision intake form & Zod schema definition\n\n## Backlog (Upcoming Phases)\n- [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator\n- [ ] Phases 16–20: Upstash QStash async job dispatcher, Groq life agent, SSE streaming\n- [ ] Phases 21–25: 2D Canvas multiverse branching tree, time scrubber (Months 0–60), diary drawer\n- [ ] Phases 26–30: Gemini long-context narrator, regret heatmap, safety guardrails, production launch",
+      "last_modified": "2026-10-11T11:56:42.984Z"
     }
   ]
 }
