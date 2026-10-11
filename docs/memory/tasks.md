@@ -9,9 +9,9 @@
 - [x] Phase 6: Vercel AI SDK multi-provider matrix (Groq, NVIDIA NIM, Gemini) in `src/lib/ai/providers.ts`
 - [x] Phase 7: Resilient LLM Router with automatic fallback and telemetry in `src/lib/ai/router.ts`
 - [x] Phase 8: Veeshree memory layer integration client in `src/lib/memory/veeshree.ts`
+- [x] Phase 9: Zero-token financial calculation engine in `src/lib/simulation/financeEngine.ts`
 
 ## Active Tasks
-- [ ] Phase 9: Zero-token financial calculation engine in `src/lib/simulation/financeEngine.ts`
 - [ ] Phase 10: Statistical clamping and burnout invariant engine in `src/lib/simulation/statClamper.ts`
 - [ ] Phase 11: Weighted random life event roller in `src/lib/simulation/eventRoller.ts`
 - [ ] Phase 12: Decision intake form & Zod schema definition

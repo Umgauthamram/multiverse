@@ -14,15 +14,15 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Simulation Engines & Algorithmic Foundation (Phases 9–11)
-- **Status**: Ready for Phase 9 (Zero-Token Financial Calculation Engine)
+- **Current Focus**: Simulation Engines & Algorithmic Foundation (Phases 10–11)
+- **Status**: Ready for Phase 10 (Statistical Clamping & Burnout Invariant Engine)
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 9: Zero-token financial calculation engine (`src/lib/simulation/financeEngine.ts`)
 - Phase 7: Resilient LLM Router with automatic fallback & telemetry (`src/lib/ai/router.ts`)
 - Phase 6: Vercel AI SDK multi-provider matrix setup (`src/lib/ai/providers.ts`)
 - Phase 5: Upstash Redis client with distributed Lua lock engine (`src/lib/redis/client.ts`)
 - Phase 4: Serverless MongoDB Atlas client singleton (`src/lib/db/mongodb.ts`)
-- Phase 8: Veeshree memory layer client (`src/lib/memory/veeshree.ts`)
 
 ## 4. Next Immediate Steps
 - [ ] Implement `src/lib/simulation/financeEngine.ts` (Phase 9)
