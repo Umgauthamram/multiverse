@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Simulation Engines & Algorithmic Foundation (Phases 10–11)
-- **Status**: Ready for Phase 10 (Statistical Clamping & Burnout Invariant Engine)
+- **Current Focus**: User Interface & Intake Pipeline (Phase 12)
+- **Status**: Ready for Phase 12 (Decision Intake Form & Zod Schema Definition)
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 11: Weighted random life event roller (`src/lib/simulation/eventRoller.ts`)
+- Phase 10: Statistical clamping and burnout invariant engine (`src/lib/simulation/statClamper.ts`)
 - Phase 9: Zero-token financial calculation engine (`src/lib/simulation/financeEngine.ts`)
+- Phase 8: Veeshree memory layer integration client (`src/lib/memory/veeshree.ts`)
 - Phase 7: Resilient LLM Router with automatic fallback & telemetry (`src/lib/ai/router.ts`)
-- Phase 6: Vercel AI SDK multi-provider matrix setup (`src/lib/ai/providers.ts`)
-- Phase 5: Upstash Redis client with distributed Lua lock engine (`src/lib/redis/client.ts`)
-- Phase 4: Serverless MongoDB Atlas client singleton (`src/lib/db/mongodb.ts`)
 
 ## 4. Next Immediate Steps
-- [ ] Implement `src/lib/simulation/financeEngine.ts` (Phase 9)
-- [ ] Implement statistical boundary clamping & burnout trigger (Phase 10)
-- [ ] Implement calibrated weighted random life event roller (Phase 11)
+- [ ] Build 5-question intake UI and Zod schema in `src/lib/schemas/intake.ts` (Phase 12)
+- [ ] Voice-to-text input via Web Speech API & Whisper fallback (Phase 13)
+- [ ] NVIDIA NIM World-Builder Agent for cast creation (Phase 14)
