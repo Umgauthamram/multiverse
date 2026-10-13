@@ -20,8 +20,10 @@
 
 - [x] Phase 14: World-Builder Agent (NVIDIA NIM) in `src/lib/ai/agents/worldBuilder.ts`
 
+- [x] Phase 15: Persona Seed Generator for 12 Timelines in `src/lib/simulation/personaSeeder.ts`
+
 ## Active Tasks
-- [ ] Phase 15: Persona Seed Generator for 12 Timelines in `src/lib/simulation/personaSeeder.ts`
+- [ ] Phase 16: Upstash QStash Worker & Async Job Dispatcher in `src/app/api/simulate/dispatch/route.ts`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
