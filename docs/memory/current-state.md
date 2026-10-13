@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: 20-Quarter Simulation Batch Coordinator with Rate Limiting (Phase 18)
-- **Status**: Phase 17 completed (Groq Delta-Only Life Agent); Ready for Phase 18
+- **Current Focus**: Server-Sent Events (SSE) Progress Streaming (Phase 19)
+- **Status**: Phase 18 completed (Timeline Orchestrator & Multi-Step Batch Runner); Ready for Phase 19
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 18: Timeline Orchestrator & Multi-Step Batch Runner (`src/lib/simulation/timelineRunner.ts`)
 - Phase 17: Delta-Only Life Simulation Agent via Groq (`src/lib/ai/agents/lifeAgent.ts`)
 - Phase 16: Upstash QStash Worker & Async Job Dispatcher (`src/lib/queue/qstash.ts`, `/api/simulate/dispatch`, `/api/simulate/step-batch`)
 - Phase 15: Persona Seed Generator for 12 Timelines (`src/lib/simulation/personaSeeder.ts`)
 - Phase 14: World-Builder Agent via NVIDIA NIM (`src/lib/ai/agents/worldBuilder.ts`)
-- Phase 13: Voice-to-Text input via Web Speech API & fallback (`src/lib/audio/speechRecognition.ts`, `src/components/intake/VoiceInput.tsx`)
 
 ## 4. Next Immediate Steps
-- [ ] Implement 20-quarter simulation batch coordinator with concurrency rate limits in `src/lib/simulation/batchCoordinator.ts` (Phase 18)
-- [ ] Build Server-Sent Events (SSE) streaming route for real-time progress (Phase 19)
-- [ ] Implement MongoDB run persistence & state hydration (Phase 20)
+- [ ] Build Server-Sent Events (SSE) streaming route for real-time progress in `src/app/api/simulate/stream/[id]/route.ts` (Phase 19)
+- [ ] Finalize MongoDB Simulation Model & Indexing Strategy in `src/lib/db/models/Simulation.ts` (Phase 20)
+- [ ] Build Anti-AI-Slop Dark HUD foundation in `src/components/hud/` (Phase 21)
