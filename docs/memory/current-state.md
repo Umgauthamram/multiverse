@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Delta-Only Life Simulation Agent (Phase 17)
-- **Status**: Ready for Phase 17 (Groq Delta-Only Life Agent)
+- **Current Focus**: 20-Quarter Simulation Batch Coordinator with Rate Limiting (Phase 18)
+- **Status**: Phase 17 completed (Groq Delta-Only Life Agent); Ready for Phase 18
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 17: Delta-Only Life Simulation Agent via Groq (`src/lib/ai/agents/lifeAgent.ts`)
 - Phase 16: Upstash QStash Worker & Async Job Dispatcher (`src/lib/queue/qstash.ts`, `/api/simulate/dispatch`, `/api/simulate/step-batch`)
 - Phase 15: Persona Seed Generator for 12 Timelines (`src/lib/simulation/personaSeeder.ts`)
 - Phase 14: World-Builder Agent via NVIDIA NIM (`src/lib/ai/agents/worldBuilder.ts`)
 - Phase 13: Voice-to-Text input via Web Speech API & fallback (`src/lib/audio/speechRecognition.ts`, `src/components/intake/VoiceInput.tsx`)
-- Phase 12: Decision intake form & Zod schema definition (`src/lib/schemas/intake.ts`, `src/components/intake/IntakeForm.tsx`)
 
 ## 4. Next Immediate Steps
-- [ ] Implement Groq Delta-Only Life Simulation Agent in `src/lib/ai/agents/lifeAgent.ts` (Phase 17)
-- [ ] Implement 20-quarter batch coordinator with concurrency rate limits (Phase 18)
+- [ ] Implement 20-quarter simulation batch coordinator with concurrency rate limits in `src/lib/simulation/batchCoordinator.ts` (Phase 18)
 - [ ] Build Server-Sent Events (SSE) streaming route for real-time progress (Phase 19)
+- [ ] Implement MongoDB run persistence & state hydration (Phase 20)

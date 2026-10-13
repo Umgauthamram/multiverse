@@ -23,9 +23,10 @@
 - [x] Phase 15: Persona Seed Generator for 12 Timelines in `src/lib/simulation/personaSeeder.ts`
 
 - [x] Phase 16: Upstash QStash Worker & Async Job Dispatcher in `src/app/api/simulate/dispatch/route.ts` & `src/app/api/simulate/step-batch/route.ts`
+- [x] Phase 17: Delta-Only Life Simulation Agent (Groq) in `src/lib/ai/agents/lifeAgent.ts`
 
 ## Active Tasks
-- [ ] Phase 17: Delta-Only Life Simulation Agent (Groq) in `src/lib/ai/agents/lifeAgent.ts`
+- [ ] Phase 18: 20-Quarter Simulation Batch Coordinator with Rate Limiting in `src/lib/simulation/batchCoordinator.ts`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
