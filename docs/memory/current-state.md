@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: MongoDB Simulation Model & Indexing Strategy (Phase 20)
-- **Status**: Phase 19 completed (Server-Sent Events Progress Streaming); Ready for Phase 20
+- **Current Focus**: Anti-AI-Slop Design System & Dark HUD Foundation (Phase 21)
+- **Status**: Phase 20 completed (MongoDB Simulation Model & Indexing Strategy); Ready for Phase 21
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 20: MongoDB Simulation Model & Indexing Strategy (`src/lib/db/models/Simulation.ts`)
 - Phase 19: Server-Sent Events (SSE) Progress Streaming (`src/app/api/simulate/stream/[id]/route.ts`, `src/lib/simulation/streamManager.ts`)
 - Phase 18: Timeline Orchestrator & Multi-Step Batch Runner (`src/lib/simulation/timelineRunner.ts`)
 - Phase 17: Delta-Only Life Simulation Agent via Groq (`src/lib/ai/agents/lifeAgent.ts`)
 - Phase 16: Upstash QStash Worker & Async Job Dispatcher (`src/lib/queue/qstash.ts`, `/api/simulate/dispatch`, `/api/simulate/step-batch`)
-- Phase 15: Persona Seed Generator for 12 Timelines (`src/lib/simulation/personaSeeder.ts`)
 
 ## 4. Next Immediate Steps
-- [ ] Finalize MongoDB Simulation Model & Indexing Strategy in `src/lib/db/models/Simulation.ts` (Phase 20)
 - [ ] Build Anti-AI-Slop Dark HUD foundation in `src/components/hud/` (Phase 21)
 - [ ] Build 2D HTML5 Canvas Branching Tree Visualizer in `src/components/tree/MultiverseTreeCanvas.tsx` (Phase 22)
+- [ ] Implement Dynamic Branch Color States & Event Popups (Phase 23)

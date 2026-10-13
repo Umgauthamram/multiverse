@@ -26,9 +26,10 @@
 - [x] Phase 17: Delta-Only Life Simulation Agent (Groq) in `src/lib/ai/agents/lifeAgent.ts`
 - [x] Phase 18: Timeline Orchestrator & Multi-Step Batch Runner in `src/lib/simulation/timelineRunner.ts`
 - [x] Phase 19: Server-Sent Events (SSE) Progress Streaming in `src/app/api/simulate/stream/[id]/route.ts`
+- [x] Phase 20: MongoDB Simulation Model & Indexing Strategy in `src/lib/db/models/Simulation.ts`
 
 ## Active Tasks
-- [ ] Phase 20: MongoDB Simulation Model & Indexing Strategy in `src/lib/db/models/Simulation.ts`
+- [ ] Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation in `src/components/hud/`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
