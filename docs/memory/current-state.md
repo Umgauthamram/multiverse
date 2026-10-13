@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: World Building & Cast Creation (Phase 14)
-- **Status**: Ready for Phase 14 (World-Builder Agent via NVIDIA NIM)
+- **Current Focus**: Timeline Branch Persona Seeding (Phase 15)
+- **Status**: Ready for Phase 15 (Persona Seed Generator for 12 Timelines)
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 14: World-Builder Agent via NVIDIA NIM (`src/lib/ai/agents/worldBuilder.ts`)
 - Phase 13: Voice-to-Text input via Web Speech API & fallback (`src/lib/audio/speechRecognition.ts`, `src/components/intake/VoiceInput.tsx`)
 - Phase 12: Decision intake form & Zod schema definition (`src/lib/schemas/intake.ts`, `src/components/intake/IntakeForm.tsx`)
 - Phase 11: Weighted random life event roller (`src/lib/simulation/eventRoller.ts`)
 - Phase 10: Statistical clamping and burnout invariant engine (`src/lib/simulation/statClamper.ts`)
-- Phase 9: Zero-token financial calculation engine (`src/lib/simulation/financeEngine.ts`)
 
 ## 4. Next Immediate Steps
-- [ ] Build World-Builder Agent with NVIDIA NIM (`meta/llama-3.1-70b-instruct`) in `src/lib/ai/agents/worldBuilder.ts` (Phase 14)
 - [ ] Implement Persona Seed Generator for 12 timeline branches in `src/lib/simulation/personaSeeder.ts` (Phase 15)
-- [ ] Upstash QStash async job dispatcher and batch worker (Phase 16)
+- [ ] Implement Upstash QStash async job dispatcher and batch worker (Phase 16)
+- [ ] Implement Groq Delta-Only Life Simulation Agent (Phase 17)

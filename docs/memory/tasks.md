@@ -18,8 +18,10 @@
 
 - [x] Phase 13: Voice-to-Text input via Web Speech API & Whisper fallback in `src/components/intake/VoiceInput.tsx`
 
+- [x] Phase 14: World-Builder Agent (NVIDIA NIM) in `src/lib/ai/agents/worldBuilder.ts`
+
 ## Active Tasks
-- [ ] Phase 14: World-Builder Agent (NVIDIA NIM) in `src/lib/ai/agents/worldBuilder.ts`
+- [ ] Phase 15: Persona Seed Generator for 12 Timelines in `src/lib/simulation/personaSeeder.ts`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
