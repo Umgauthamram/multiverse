@@ -32,10 +32,10 @@
 - [x] Phase 23: Dynamic Branch Color States & Event Popups in `src/components/tree/BranchNodePopup.tsx`
 
 ## Active Tasks
-- [ ] Phase 24: Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx`
+- [x] Phase 24: Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx`
+
+## Active Tasks
+- [ ] Phase 25: Branch Deep-Dive Diary Drawer in `src/components/tree/BranchDetailDrawer.tsx`
 
 ## Backlog (Upcoming Phases)
-- [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
-- [ ] Phases 16–20: Upstash QStash async job dispatcher, Groq life agent, SSE streaming
-- [ ] Phases 21–25: 2D Canvas multiverse branching tree, time scrubber (Months 0–60), diary drawer
 - [ ] Phases 26–30: Gemini long-context narrator, regret heatmap, safety guardrails, production launch

@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Interactive Time Scrubber (Months 0 to 60) (Phase 24)
-- **Status**: Phase 23 completed (Dynamic Branch Color States & Event Popups); Ready for Phase 24
+- **Current Focus**: Branch Deep-Dive Diary Drawer (Phase 25)
+- **Status**: Phase 24 completed (Interactive Time Scrubber Months 0 to 60); Ready for Phase 25
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 24: Interactive Time Scrubber (`src/components/tree/TimeScrubber.tsx`, `tests/unit/timeScrubber.test.tsx`)
 - Phase 23: Dynamic Branch Color States & Event Popups (`src/components/tree/BranchNodePopup.tsx`, `src/lib/simulation/branchColorEngine.ts`)
 - Phase 22: 2D HTML5 Canvas Branching Tree Visualizer (`src/components/tree/MultiverseTreeCanvas.tsx`)
 - Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation (`src/components/hud/`, `src/lib/design/antiSlopGuard.ts`)
 - Phase 20: MongoDB Simulation Model & Indexing Strategy (`src/lib/db/models/Simulation.ts`)
-- Phase 19: Server-Sent Events (SSE) Progress Streaming (`src/app/api/simulate/stream/[id]/route.ts`, `src/lib/simulation/streamManager.ts`)
 
 ## 4. Next Immediate Steps
-- [ ] Build Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx` (Phase 24)
 - [ ] Build Branch Deep-Dive Diary Drawer in `src/components/tree/BranchDetailDrawer.tsx` (Phase 25)
 - [ ] Create Dense Digest Serializer for Gemini Synthesis in `src/lib/simulation/digestSerializer.ts` (Phase 26)
+- [ ] Gemini Long-Context Cross-Timeline Narrator in `src/lib/ai/agents/narratorAgent.ts` (Phase 27)
