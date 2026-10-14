@@ -29,9 +29,10 @@
 - [x] Phase 20: MongoDB Simulation Model & Indexing Strategy in `src/lib/db/models/Simulation.ts`
 - [x] Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation in `src/components/hud/`
 - [x] Phase 22: 2D HTML5 Canvas Branching Tree Visualizer in `src/components/tree/MultiverseTreeCanvas.tsx`
+- [x] Phase 23: Dynamic Branch Color States & Event Popups in `src/components/tree/BranchNodePopup.tsx`
 
 ## Active Tasks
-- [ ] Phase 23: Dynamic Branch Color States & Event Popups in `src/components/tree/BranchNodePopup.tsx`
+- [ ] Phase 24: Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator

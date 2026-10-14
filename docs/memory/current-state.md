@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Dynamic Branch Color States & Event Popups (Phase 23)
-- **Status**: Phase 22 completed (2D HTML5 Canvas Branching Tree Visualizer); Ready for Phase 23
+- **Current Focus**: Interactive Time Scrubber (Months 0 to 60) (Phase 24)
+- **Status**: Phase 23 completed (Dynamic Branch Color States & Event Popups); Ready for Phase 24
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 23: Dynamic Branch Color States & Event Popups (`src/components/tree/BranchNodePopup.tsx`, `src/lib/simulation/branchColorEngine.ts`)
 - Phase 22: 2D HTML5 Canvas Branching Tree Visualizer (`src/components/tree/MultiverseTreeCanvas.tsx`)
 - Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation (`src/components/hud/`, `src/lib/design/antiSlopGuard.ts`)
 - Phase 20: MongoDB Simulation Model & Indexing Strategy (`src/lib/db/models/Simulation.ts`)
 - Phase 19: Server-Sent Events (SSE) Progress Streaming (`src/app/api/simulate/stream/[id]/route.ts`, `src/lib/simulation/streamManager.ts`)
-- Phase 18: Timeline Orchestrator & Multi-Step Batch Runner (`src/lib/simulation/timelineRunner.ts`)
 
 ## 4. Next Immediate Steps
-- [ ] Implement Dynamic Branch Color States & Event Popups in `src/components/tree/BranchNodePopup.tsx` (Phase 23)
 - [ ] Build Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx` (Phase 24)
 - [ ] Build Branch Deep-Dive Diary Drawer in `src/components/tree/BranchDetailDrawer.tsx` (Phase 25)
+- [ ] Create Dense Digest Serializer for Gemini Synthesis in `src/lib/simulation/digestSerializer.ts` (Phase 26)
