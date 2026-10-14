@@ -27,9 +27,10 @@
 - [x] Phase 18: Timeline Orchestrator & Multi-Step Batch Runner in `src/lib/simulation/timelineRunner.ts`
 - [x] Phase 19: Server-Sent Events (SSE) Progress Streaming in `src/app/api/simulate/stream/[id]/route.ts`
 - [x] Phase 20: MongoDB Simulation Model & Indexing Strategy in `src/lib/db/models/Simulation.ts`
+- [x] Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation in `src/components/hud/`
 
 ## Active Tasks
-- [ ] Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation in `src/components/hud/`
+- [ ] Phase 22: 2D HTML5 Canvas Branching Tree Visualizer in `src/components/tree/MultiverseTreeCanvas.tsx`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator

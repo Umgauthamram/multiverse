@@ -14,17 +14,17 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Anti-AI-Slop Design System & Dark HUD Foundation (Phase 21)
-- **Status**: Phase 20 completed (MongoDB Simulation Model & Indexing Strategy); Ready for Phase 21
+- **Current Focus**: 2D HTML5 Canvas Branching Tree Visualizer (Phase 22)
+- **Status**: Phase 21 completed (Anti-AI-Slop Design System & Dark HUD Foundation); Ready for Phase 22
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation (`src/components/hud/`, `src/lib/design/antiSlopGuard.ts`)
 - Phase 20: MongoDB Simulation Model & Indexing Strategy (`src/lib/db/models/Simulation.ts`)
 - Phase 19: Server-Sent Events (SSE) Progress Streaming (`src/app/api/simulate/stream/[id]/route.ts`, `src/lib/simulation/streamManager.ts`)
 - Phase 18: Timeline Orchestrator & Multi-Step Batch Runner (`src/lib/simulation/timelineRunner.ts`)
 - Phase 17: Delta-Only Life Simulation Agent via Groq (`src/lib/ai/agents/lifeAgent.ts`)
-- Phase 16: Upstash QStash Worker & Async Job Dispatcher (`src/lib/queue/qstash.ts`, `/api/simulate/dispatch`, `/api/simulate/step-batch`)
 
 ## 4. Next Immediate Steps
-- [ ] Build Anti-AI-Slop Dark HUD foundation in `src/components/hud/` (Phase 21)
 - [ ] Build 2D HTML5 Canvas Branching Tree Visualizer in `src/components/tree/MultiverseTreeCanvas.tsx` (Phase 22)
 - [ ] Implement Dynamic Branch Color States & Event Popups (Phase 23)
+- [ ] Build Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx` (Phase 24)
