@@ -28,9 +28,10 @@
 - [x] Phase 19: Server-Sent Events (SSE) Progress Streaming in `src/app/api/simulate/stream/[id]/route.ts`
 - [x] Phase 20: MongoDB Simulation Model & Indexing Strategy in `src/lib/db/models/Simulation.ts`
 - [x] Phase 21: Anti-AI-Slop Design System & Dark HUD Foundation in `src/components/hud/`
+- [x] Phase 22: 2D HTML5 Canvas Branching Tree Visualizer in `src/components/tree/MultiverseTreeCanvas.tsx`
 
 ## Active Tasks
-- [ ] Phase 22: 2D HTML5 Canvas Branching Tree Visualizer in `src/components/tree/MultiverseTreeCanvas.tsx`
+- [ ] Phase 23: Dynamic Branch Color States & Event Popups in `src/components/tree/BranchNodePopup.tsx`
 
 ## Backlog (Upcoming Phases)
 - [ ] Phases 13–15: Voice STT input, NVIDIA world builder, persona seed generator
