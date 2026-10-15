@@ -31,11 +31,11 @@
 - [x] Phase 22: 2D HTML5 Canvas Branching Tree Visualizer in `src/components/tree/MultiverseTreeCanvas.tsx`
 - [x] Phase 23: Dynamic Branch Color States & Event Popups in `src/components/tree/BranchNodePopup.tsx`
 
-## Active Tasks
 - [x] Phase 24: Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx`
+- [x] Phase 25: Branch Deep-Dive Diary Drawer in `src/components/tree/BranchDetailDrawer.tsx`
 
 ## Active Tasks
-- [ ] Phase 25: Branch Deep-Dive Diary Drawer in `src/components/tree/BranchDetailDrawer.tsx`
+- [ ] Phase 26: Dense Digest Serializer for Gemini Synthesis in `src/lib/simulation/digestSerializer.ts`
 
 ## Backlog (Upcoming Phases)
-- [ ] Phases 26–30: Gemini long-context narrator, regret heatmap, safety guardrails, production launch
+- [ ] Phases 27–30: Gemini long-context narrator, regret heatmap, safety guardrails, production launch

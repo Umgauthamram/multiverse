@@ -42,3 +42,4 @@ Thumbs.db
 /.vee/config.json
 /.vee/index.json
 .env
+.env.example
