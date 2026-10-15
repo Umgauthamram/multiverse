@@ -35,8 +35,10 @@
 - [x] Phase 25: Branch Deep-Dive Diary Drawer in `src/components/tree/BranchDetailDrawer.tsx`
 - [x] Phase 26: Dense Digest Serializer for Gemini Synthesis in `src/lib/simulation/digestSerializer.ts`
 
+- [x] Phase 27: Gemini 2.5 Flash Narrator & Comparative Analyst in `src/lib/ai/agents/narratorAgent.ts`
+
 ## Active Tasks
-- [ ] Phase 27: Gemini 2.5 Flash Narrator & Comparative Analyst in `src/lib/ai/agents/narratorAgent.ts`
+- [ ] Phase 28: Finale Screen & Regret Heatmap Visualization in `src/components/finale/FinaleReportView.tsx`
 
 ## Backlog (Upcoming Phases)
-- [ ] Phases 28–30: Finale screen & regret heatmap, safety guardrails, production launch
+- [ ] Phases 29–30: Safety guardrails, production launch
