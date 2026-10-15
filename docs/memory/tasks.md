@@ -33,9 +33,10 @@
 
 - [x] Phase 24: Interactive Time Scrubber (Months 0 to 60) in `src/components/tree/TimeScrubber.tsx`
 - [x] Phase 25: Branch Deep-Dive Diary Drawer in `src/components/tree/BranchDetailDrawer.tsx`
+- [x] Phase 26: Dense Digest Serializer for Gemini Synthesis in `src/lib/simulation/digestSerializer.ts`
 
 ## Active Tasks
-- [ ] Phase 26: Dense Digest Serializer for Gemini Synthesis in `src/lib/simulation/digestSerializer.ts`
+- [ ] Phase 27: Gemini 2.5 Flash Narrator & Comparative Analyst in `src/lib/ai/agents/narratorAgent.ts`
 
 ## Backlog (Upcoming Phases)
-- [ ] Phases 27–30: Gemini long-context narrator, regret heatmap, safety guardrails, production launch
+- [ ] Phases 28–30: Finale screen & regret heatmap, safety guardrails, production launch
