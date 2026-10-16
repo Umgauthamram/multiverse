@@ -8,6 +8,11 @@ import {
   CorePriority,
 } from "@/lib/schemas/intake";
 import { VoiceInput } from "./VoiceInput";
+import { CrisisDialog } from "@/components/safety/CrisisDialog";
+import {
+  evaluateIntakeSafety,
+  CrisisDetectionResult,
+} from "@/lib/safety/crisisInterceptor";
 
 interface IntakeFormProps {
   initialValues?: Partial<IntakeFormValues>;
@@ -50,6 +55,7 @@ export function IntakeForm({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [crisisResult, setCrisisResult] = useState<CrisisDetectionResult | null>(null);
 
   // Field change helpers
   const updateField = <K extends keyof IntakeFormValues>(
@@ -170,6 +176,21 @@ export function IntakeForm({
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
+      if (currentStep === 3) {
+        const crisis = evaluateIntakeSafety({ decisionPrompt: formData.decisionPrompt });
+        if (crisis.isCrisis) {
+          setCrisisResult(crisis);
+          return;
+        }
+      } else if (currentStep === 4) {
+        const crisis = evaluateIntakeSafety({
+          optionA: { name: formData.optionA.name, description: formData.optionA.description },
+        });
+        if (crisis.isCrisis) {
+          setCrisisResult(crisis);
+          return;
+        }
+      }
       setCurrentStep((prev) => Math.min(5, prev + 1));
     }
   };
@@ -180,6 +201,14 @@ export function IntakeForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Deterministic crisis safety guardrail check
+    const crisisCheck = evaluateIntakeSafety(formData);
+    if (crisisCheck.isCrisis) {
+      setCrisisResult(crisisCheck);
+      return;
+    }
+
     const result = validateIntakeInput(formData);
     if (!result.success && result.errors) {
       setErrors(result.errors);
@@ -722,6 +751,15 @@ export function IntakeForm({
           )}
         </div>
       </form>
+
+      <CrisisDialog
+        isOpen={Boolean(crisisResult?.isCrisis)}
+        onClose={() => setCrisisResult(null)}
+        category={crisisResult?.category}
+        matchedPattern={crisisResult?.matchedPattern}
+        helplines={crisisResult?.helplines}
+      />
     </div>
   );
 }
+
