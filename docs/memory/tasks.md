@@ -37,8 +37,10 @@
 
 - [x] Phase 27: Gemini 2.5 Flash Narrator & Comparative Analyst in `src/lib/ai/agents/narratorAgent.ts`
 
+- [x] Phase 28: Finale Screen & Regret Heatmap Visualization in `src/components/finale/FinaleReportView.tsx`
+
 ## Active Tasks
-- [ ] Phase 28: Finale Screen & Regret Heatmap Visualization in `src/components/finale/FinaleReportView.tsx`
+- [ ] Phase 29: Safety Guardrails & Crisis Interceptor in `src/lib/safety/crisisInterceptor.ts`
 
 ## Backlog (Upcoming Phases)
-- [ ] Phases 29–30: Safety guardrails, production launch
+- [ ] Phase 30: End-to-End System Smoke Test & Deployment Readiness

@@ -14,17 +14,16 @@
   - Testing & CI: Vitest (36 automated unit tests passing), GitHub Actions CI/CD (`.github/workflows/ci.yml`)
 
 ## 2. Active Feature / Milestone
-- **Current Focus**: Finale Screen & Regret Heatmap Visualization (Phase 28)
-- **Status**: Phase 27 completed (Gemini 2.5 Flash Narrator & Comparative Analyst); Ready for Phase 28
+- **Current Focus**: Safety Guardrails & Crisis Interceptor (Phase 29)
+- **Status**: Phase 28 completed (Finale Screen & Regret Heatmap Visualization); Ready for Phase 29
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Phase 28: Finale Screen & Regret Heatmap (`src/components/finale/FinaleReportView.tsx`, `tests/unit/finaleReportView.test.tsx`)
 - Phase 27: Gemini 2.5 Flash Narrator Agent (`src/lib/ai/agents/narratorAgent.ts`, `tests/unit/narratorAgent.test.ts`)
 - Phase 26: Dense Digest Serializer (`src/lib/simulation/digestSerializer.ts`, `tests/unit/digestSerializer.test.ts`)
 - Phase 25: Branch Deep-Dive Diary Drawer (`src/components/tree/BranchDetailDrawer.tsx`, `tests/unit/branchDetailDrawer.test.tsx`)
 - Phase 24: Interactive Time Scrubber (`src/components/tree/TimeScrubber.tsx`, `tests/unit/timeScrubber.test.tsx`)
-- Phase 23: Dynamic Branch Color States & Event Popups (`src/components/tree/BranchNodePopup.tsx`, `src/lib/simulation/branchColorEngine.ts`)
 
 ## 4. Next Immediate Steps
-- [ ] Finale Screen & Regret Heatmap Visualization in `src/components/finale/FinaleReportView.tsx` (Phase 28)
 - [ ] Safety Guardrails & Crisis Interceptor in `src/lib/safety/crisisInterceptor.ts` (Phase 29)
 - [ ] End-to-End System Smoke Test & Deployment Readiness (Phase 30)
