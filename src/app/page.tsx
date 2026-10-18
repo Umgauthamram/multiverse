@@ -3,10 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { IntakeForm } from "@/components/intake/IntakeForm";
 import { IntakeFormValues, DEFAULT_INTAKE_VALUES } from "@/lib/schemas/intake";
-import {
-  MultiverseTreeCanvas,
-  TimelineTreeBranch,
-} from "@/components/tree/MultiverseTreeCanvas";
+import { MultiverseTreeCanvas } from "@/components/tree/MultiverseTreeCanvas";
 import { TimeScrubber } from "@/components/tree/TimeScrubber";
 import {
   BranchDetailDrawer,
@@ -183,7 +180,7 @@ export default function Home() {
         status: "active",
         recordedAt: new Date(),
       }));
-  }, [selectedTimelineId, simData]);
+  }, [selectedTimelineId, simData, drawerTimelineData?.personaSeed]);
 
   const handleSelectNode = (timelineId: string, quarter: number) => {
     setSelectedTimelineId(timelineId);

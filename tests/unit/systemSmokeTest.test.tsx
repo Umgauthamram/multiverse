@@ -7,7 +7,6 @@ import {
   IntakeFormValues,
 } from "@/lib/schemas/intake";
 import {
-  inspectForCrisis,
   evaluateIntakeSafety,
 } from "@/lib/safety/crisisInterceptor";
 import { generateWorldCast } from "@/lib/ai/agents/worldBuilder";
@@ -21,7 +20,6 @@ import {
 } from "@/lib/simulation/timelineRunner";
 import { serializeSimulationDigest } from "@/lib/simulation/digestSerializer";
 import {
-  generateNarratorReport,
   FinaleReport,
   FinaleReportSchema,
 } from "@/lib/ai/agents/narratorAgent";
@@ -29,6 +27,7 @@ import { ProviderCandidate } from "@/lib/ai/router";
 import { FinaleReportView } from "@/components/finale/FinaleReportView";
 import { MultiverseTreeCanvas, TimelineTreeBranch } from "@/components/tree/MultiverseTreeCanvas";
 import { assertAntiSlopCompliance } from "@/lib/design/antiSlopGuard";
+import { LanguageModel } from "ai";
 
 describe("Phase 30: End-to-End System Smoke Test & Integration Pipeline", () => {
   it("executes complete lifecycle: Intake -> Safety -> World Build -> 12 Seeds -> Timeline Sim -> Digest -> Narrator -> Finale UI", async () => {
@@ -76,7 +75,7 @@ describe("Phase 30: End-to-End System Smoke Test & Integration Pipeline", () => 
     // =========================================================================
     // Stage 3: NVIDIA NIM World-Builder Cast Generation
     // =========================================================================
-    const dummyModel = { modelId: "mock-model", provider: "mock" } as any;
+    const dummyModel = { modelId: "mock-model", provider: "mock" } as unknown as LanguageModel;
     const mockChain: ProviderCandidate[] = [
       { name: "nvidia", getModel: () => dummyModel },
       { name: "gemini", getModel: () => dummyModel },
@@ -156,7 +155,7 @@ describe("Phase 30: End-to-End System Smoke Test & Integration Pipeline", () => 
     // =========================================================================
     // Stage 5: Deterministic Multi-Step Timeline Runner (Quarters 1 to 4)
     // =========================================================================
-    const mockStepExecutor = vi.fn().mockImplementation((_args: any) => {
+    const mockStepExecutor = vi.fn().mockImplementation(() => {
       return Promise.resolve({
         object: {
           deltaHappiness: 2,
