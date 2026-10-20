@@ -7,7 +7,8 @@ export type StreamEventType =
   | "timeline_complete"
   | "simulation_complete"
   | "error"
-  | "heartbeat";
+  | "heartbeat"
+  | "scene";
 
 export interface StreamMessage {
   event: StreamEventType;

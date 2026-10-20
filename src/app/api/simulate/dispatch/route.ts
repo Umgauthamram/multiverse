@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { dispatchBatchJob, BatchJobPayload } from "@/lib/queue/qstash";
-import { env } from "@/lib/env";
+import { dispatchTimelines } from "@/lib/queue/dispatchHelper";
 
 const DispatchRequestSchema = z.object({
   sessionId: z.string().min(1),
@@ -41,38 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { sessionId, timelines } = parsed.data;
-    const appUrl =
-      env.NEXT_PUBLIC_APP_URL ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      "http://localhost:3000";
-    const destinationUrl = `${appUrl}/api/simulate/step-batch`;
-
-    const dispatched: Array<{ timelineId: string; messageId: string }> = [];
-
-    // Dispatch initial 5-quarter batch (Quarters 1–5) for all timelines
-    for (const timeline of timelines) {
-      const payload: BatchJobPayload = {
-        sessionId,
-        timelineId: timeline.timelineId,
-        branchOption: timeline.branchOption,
-        personaSeed: timeline.personaSeed,
-        startQuarter: 1,
-        endQuarter: 5,
-        currentLiquidSavings: timeline.initialLiquidSavings,
-        currentMonthlyBurn: timeline.initialMonthlyBurn,
-        currentStats: timeline.initialStats,
-      };
-
-      const result = await dispatchBatchJob({
-        destinationUrl,
-        payload,
-      });
-
-      dispatched.push({
-        timelineId: timeline.timelineId,
-        messageId: result.messageId,
-      });
-    }
+    const dispatched = await dispatchTimelines(sessionId, timelines);
 
     return NextResponse.json({
       success: true,

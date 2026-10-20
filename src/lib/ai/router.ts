@@ -110,6 +110,7 @@ export async function routeGenerateObject<T>(params: {
   system?: string;
   customChain?: ProviderCandidate[];
   executor?: ObjectExecutor<T>;
+  onFallback?: (from: ProviderName, to: ProviderName) => void | Promise<void>;
 }): Promise<RouterResult<T>> {
   const chain = params.customChain || getProviderChainForRole(params.role);
   const executeFn = params.executor || (generateObject as unknown as ObjectExecutor<T>);
@@ -147,6 +148,14 @@ export async function routeGenerateObject<T>(params: {
       console.warn(
         `[LLMRouter] Provider "${candidate.name}" failed for role "${params.role}": ${errMessage}. Attempting fallback.`
       );
+
+      if (i + 1 < chain.length && params.onFallback) {
+        try {
+          await params.onFallback(candidate.name, chain[i + 1].name);
+        } catch (fbErr) {
+          console.warn("[LLMRouter] onFallback callback error:", fbErr);
+        }
+      }
 
       fallbackCount++;
     }

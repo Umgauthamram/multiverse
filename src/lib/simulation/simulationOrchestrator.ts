@@ -277,7 +277,7 @@ export function generateSimulatedMultiverse(
   ];
 
   const report: FinaleReport = {
-    executiveReflection: `Across 12 parallel futures spanning 5 years, this counterfactual simulation illuminates the true geometry of your decision. Option A (${intake.optionA.name}) offers high-tempo acceleration and peak net worth compounding, but exacts a demonstrable physical tax unless balanced boundaries are maintained. Option B (${intake.optionB.name}) insulates you against burnout and cements deep community roots, trading distribution speed for psychological sovereignty.`,
+    executiveReflection: `Across ${timelines.length} parallel futures spanning 5 years, this counterfactual simulation illuminates the true geometry of your decision. Option A (${intake.optionA.name}) offers high-tempo acceleration and peak net worth compounding, but exacts a demonstrable physical tax unless balanced boundaries are maintained. Option B (${intake.optionB.name}) insulates you against burnout and cements deep community roots, trading distribution speed for psychological sovereignty.`,
     pathAOverallSummary: `Path A (${intake.optionA.name}) produces the highest individual financial peaks, but introduces vulnerability to Year 2 burnout shocks for overcommitted personas.`,
     pathBOverallSummary: `Path B (${intake.optionB.name}) preserves personal equilibrium, avoiding critical burnout across evaluated seeds while providing steady compounding.`,
     rankedFutures,

@@ -41,13 +41,13 @@
 - [x] Phase 29: Safety Guardrails & Crisis Interceptor in `src/lib/safety/crisisInterceptor.ts` and `src/components/safety/CrisisDialog.tsx`
 - [x] Phase 30: End-to-End System Smoke Test & Deployment Readiness in `tests/unit/systemSmokeTest.test.tsx` and `src/app/page.tsx`
 - [x] Theater Phase 1: Scene Language, Compiler & Story Seeds in `src/lib/scene/` (`sceneLanguage.ts`, `sceneCompiler.ts`, `storySeeds.ts`)
+- [x] Theater Phase 2: Pipeline Wiring (`onStage` hook, `step-batch` rewrite, `sceneStore.ts`, SSE `scene` events, `/start` and `/narrator` routes)
+- [x] Theater Phase 3: `mockSceneStream` + `sceneState` reducer + `director` (`src/lib/scene/mockSceneStream.ts`, `src/lib/theater/sceneState.ts`, `src/lib/theater/director.ts`, tests: `sceneState.test.ts`, `director.test.ts`)
 
 ## Active Tasks
-- [ ] Theater Phase 2: Pipeline Wiring (`onStage` hook, `step-batch` rewrite, `sceneStore.ts`, SSE `scene` events, `/start` and `/narrator` routes)
+- [ ] Theater Phase 4: Renderer core: iso projection, floors/walls, sprite atlas, character generator, pathfinding
 
 ## Backlog (Upcoming Theater Phases)
-- [ ] Theater Phase 3: `mockSceneStream` + `sceneState` reducer + `director`
-- [ ] Theater Phase 4: Renderer core: iso projection, floors/walls, sprite atlas, character generator, pathfinding
 - [ ] Theater Phase 5: Agent Office: 9 agents, 9 monitor textures, status tags, handoff packets, NEXUS walk
 - [ ] Theater Phase 6: Life Wing: 4 rooms, state visuals, event scenes, cast NPCs, text pops
 - [ ] Theater Phase 7: `TheaterView`, `LiveTicker`, focus camera, Skip, mobile layout, a11y

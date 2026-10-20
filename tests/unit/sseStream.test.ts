@@ -6,10 +6,30 @@ import {
   streamManager,
 } from "@/lib/simulation/streamManager";
 import { TimelineQuarterRecord } from "@/lib/simulation/timelineRunner";
+import * as mongodb from "@/lib/db/mongodb";
+import * as sceneStore from "@/lib/scene/sceneStore";
+import { Db } from "mongodb";
 
 describe("Phase 19: Server-Sent Events (SSE) Progress Streaming", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+
+    vi.spyOn(mongodb, "getDb").mockResolvedValue({
+      collection: vi.fn(() => ({
+        find: vi.fn(() => ({
+          sort: vi.fn().mockReturnThis(),
+          toArray: vi.fn().mockResolvedValue([]),
+        })),
+        createIndex: vi.fn().mockResolvedValue("idx"),
+        bulkWrite: vi.fn().mockResolvedValue({}),
+      })),
+    } as unknown as Db);
+
+    vi.spyOn(sceneStore, "readLinesAfter").mockResolvedValue({
+      lines: [],
+      nextCursor: null,
+      ops: [],
+    });
   });
 
   describe("formatSSE wire protocol helper", () => {

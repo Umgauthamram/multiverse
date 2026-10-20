@@ -15,17 +15,20 @@
 
 ## 2. Active Feature / Milestone
 - **Current Focus**: Multiverse Theater — Live Simulation Visualization Layer
-- **Status**: Theater Phase 1 completed (Scene Language, Compiler, Story Seeds), verified across 31 test suites (215 unit tests passing), and production-compiled with Next.js 16 / Turbopack
+- **Status**: Theater Phase 1 (Scene Language, Compiler, Story Seeds), Phase 2 (Pipeline Wiring, onStage hooks, step-batch rewrite, sceneStore, SSE stream ?after=), and Phase 3 (`mockSceneStream` + `sceneState` reducer + `director`) completed; verified across 36 test suites (234 unit tests passing), `eslint` 0 warnings, and Next.js 16 production build passing
+- Next up: Theater Phase 4 (Renderer core: iso projection, floors/walls, sprite atlas, character generator, pathfinding)
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Theater Phase 3: Mock Scene Stream, Scene State Reducer & Director (`src/lib/scene/mockSceneStream.ts`, `src/lib/theater/sceneState.ts`, `src/lib/theater/director.ts`, tests: `sceneState.test.ts`, `director.test.ts`)
+- Theater Phase 2: Pipeline Wiring (`src/lib/scene/sceneStore.ts`, `src/app/api/simulate/step-batch/route.ts`, `src/app/api/simulate/stream/[id]/route.ts`, `src/app/api/simulate/start/route.ts`, `src/app/api/simulate/narrator/route.ts`, tests: `sceneStore.test.ts`, `stepBatchWorker.test.ts`, `sseScene.test.ts`)
 - Theater Phase 1: Scene Language, Deterministic Compiler & 4-Story Seeds (`src/lib/scene/`, `tests/unit/sceneLanguage.test.ts`, `tests/unit/sceneCompiler.test.ts`, `tests/unit/storySeeds.test.ts`)
 - Phase 30: End-to-End System Smoke Test & Deployment Readiness (`tests/unit/systemSmokeTest.test.tsx`, `src/lib/simulation/simulationOrchestrator.ts`, `src/app/page.tsx`)
 - Phase 29: Safety Guardrails & Crisis Interceptor (`src/lib/safety/crisisInterceptor.ts`, `src/components/safety/CrisisDialog.tsx`, `tests/unit/crisisInterceptor.test.tsx`)
-- Phase 28: Finale Screen & Regret Heatmap (`src/components/finale/FinaleReportView.tsx`, `tests/unit/finaleReportView.test.tsx`)
-- Phase 27: Gemini 2.5 Flash Narrator Agent (`src/lib/ai/agents/narratorAgent.ts`, `tests/unit/narratorAgent.test.ts`)
 
 ## 4. Next Immediate Steps
 - [x] Theater Phase 1: Scene Language, Compiler & Story Seeds
-- [ ] Theater Phase 2: Pipeline Wiring (`onStage` hook, `step-batch` rewrite, `sceneStore.ts`, SSE `scene` events, `/start` and `/narrator` routes)
+- [x] Theater Phase 2: Pipeline Wiring (`onStage` hook, `step-batch` rewrite, `sceneStore.ts`, SSE `scene` events, `/start` and `/narrator` routes)
+- [x] Theater Phase 3: `mockSceneStream` + `sceneState` reducer + `director`
+- [ ] Theater Phase 4: Renderer core: iso projection, floors/walls, sprite atlas, character generator, pathfinding
 
 

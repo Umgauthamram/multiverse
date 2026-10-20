@@ -47,6 +47,7 @@ export interface LifeSimulationInput {
   decisionPrompt: string;
   customChain?: ProviderCandidate[];
   executor?: ObjectExecutor<QuarterDelta>;
+  onFallback?: (from: string, to: string) => void | Promise<void>;
 }
 
 export interface LifeSimulationOutput {
@@ -86,6 +87,7 @@ Output quarter ${input.quarter} deltas (-30..+30), a 1-sentence diary snippet, a
     system: LIFE_AGENT_SYSTEM_PROMPT,
     customChain: input.customChain,
     executor: input.executor,
+    onFallback: input.onFallback,
   });
 
   return {

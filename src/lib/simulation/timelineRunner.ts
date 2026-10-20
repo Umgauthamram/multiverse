@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db/mongodb";
 import {
   LifeStats,
   LifeStatDeltas,
+  TimelineHealthStatus,
   applyAndClampStats,
 } from "@/lib/simulation/statClamper";
 import { calculateQuarterFinance } from "@/lib/simulation/financeEngine";
@@ -68,6 +69,25 @@ export interface TimelineSummary {
   peakCareerQuarter?: number;
 }
 
+import { detectHitStat, HitStat } from "@/lib/scene/sceneCompiler";
+
+export type QuarterStage =
+  | { stage: "roll"; event: LifeEvent }
+  | {
+      stage: "calc";
+      cash0: number;
+      inc: number;
+      exp: number;
+      evc: number;
+      cash1: number;
+    }
+  | { stage: "think"; provider: string }
+  | { stage: "delta"; rawDelta: LifeStatDeltas }
+  | { stage: "clamp"; stats: LifeStats; hit: HitStat }
+  | { stage: "status"; status: TimelineHealthStatus; burn: number }
+  | { stage: "say"; text: string }
+  | { stage: "done" };
+
 export interface QuarterStepConfig {
   sessionId: string;
   timelineId: string;
@@ -87,6 +107,8 @@ export interface QuarterStepConfig {
   collectionName?: string;
   customChain?: ProviderCandidate[];
   executor?: ObjectExecutor<QuarterDelta>;
+  onStage?: (stage: QuarterStage) => void | Promise<void>;
+  onFallback?: (from: string, to: string) => void | Promise<void>;
 }
 
 export interface TimelineRunConfig {
@@ -110,6 +132,8 @@ export interface TimelineRunConfig {
   customChain?: ProviderCandidate[];
   executor?: ObjectExecutor<QuarterDelta>;
   onStepComplete?: (step: TimelineQuarterRecord) => void | Promise<void>;
+  onStage?: (stage: QuarterStage) => void | Promise<void>;
+  onFallback?: (from: string, to: string) => void | Promise<void>;
 }
 
 export interface BatchRunOptions {
@@ -143,6 +167,8 @@ export async function runQuarterStep(
     collectionName = "timeline_steps",
     customChain,
     executor,
+    onStage,
+    onFallback,
   } = config;
 
   const month = quarter * 3;
@@ -154,6 +180,7 @@ export async function runQuarterStep(
     quarterIndex: quarter,
     probabilities: profile?.eventProbabilityOverrides,
   });
+  await onStage?.({ stage: "roll", event: rolledEvent });
 
   // 2. Deterministic zero-token financial compounding
   const effectiveMonthlyIncome =
@@ -170,23 +197,55 @@ export async function runQuarterStep(
     costOfLivingIndex,
     eventCashImpact: netEventCashImpact,
   });
+  await onStage?.({
+    stage: "calc",
+    cash0: currentSavings,
+    inc: effectiveMonthlyIncome,
+    exp: monthlyExpenses,
+    evc: netEventCashImpact,
+    cash1: financeOutput.endingSavings,
+  });
 
   // 3. Delta-only LLM Agent Call (Groq / Router)
-  const agentOutput = await simulateQuarterStep({
-    quarter,
-    month,
-    timelineId,
-    branchOption,
-    branchName,
-    branchLocation,
-    personaSeed,
-    currentStats,
-    currentLiquidSavings: currentSavings,
-    rolledEvent,
-    decisionPrompt,
-    customChain,
-    executor,
-  });
+  const providerName = customChain?.[0]?.name || "groq";
+  await onStage?.({ stage: "think", provider: providerName });
+
+  let agentOutput;
+  try {
+    agentOutput = await simulateQuarterStep({
+      quarter,
+      month,
+      timelineId,
+      branchOption,
+      branchName,
+      branchLocation,
+      personaSeed,
+      currentStats,
+      currentLiquidSavings: currentSavings,
+      rolledEvent,
+      decisionPrompt,
+      customChain,
+      executor,
+      onFallback,
+    });
+  } catch {
+    agentOutput = {
+      delta: {
+        quarter,
+        deltaHappiness: rolledEvent.statDeltas.deltaHappiness || 0,
+        deltaHealth: rolledEvent.statDeltas.deltaHealth || 0,
+        deltaRelationships: rolledEvent.statDeltas.deltaRelationships || 0,
+        deltaCareer: rolledEvent.statDeltas.deltaCareer || 0,
+        diaryEntry: `Quarter ${quarter}: ${rolledEvent.title}. ${rolledEvent.description}`,
+        reflection: `Navigating path ${branchOption} as ${personaSeed}.`,
+      },
+      telemetry: {
+        provider: "groq" as const,
+        fallbackCount: 3,
+        durationMs: 0,
+      },
+    };
+  }
 
   const rawDelta = agentOutput.delta;
 
@@ -209,9 +268,17 @@ export async function runQuarterStep(
       (profile?.quarterlyStatBias?.deltaCareer || 0) +
       rawDelta.deltaCareer,
   };
+  await onStage?.({ stage: "delta", rawDelta: combinedDeltas });
 
   // 5. Stat clamping & burnout invariant evaluation
   const clampedResult = applyAndClampStats(currentStats, combinedDeltas);
+  const hit = detectHitStat(clampedResult.stats);
+  await onStage?.({ stage: "clamp", stats: clampedResult.stats, hit });
+  await onStage?.({
+    stage: "status",
+    status: clampedResult.status,
+    burn: clampedResult.isBurnout ? 1 : 0,
+  });
 
   // 6. Build the persistent record
   const stepRecord: TimelineQuarterRecord = {
@@ -246,6 +313,9 @@ export async function runQuarterStep(
       : "active",
     recordedAt: new Date(),
   };
+
+  await onStage?.({ stage: "say", text: stepRecord.diaryEntry });
+  await onStage?.({ stage: "done" });
 
   // 7. Persist to MongoDB
   if (persistToDb) {
@@ -316,6 +386,8 @@ export async function runTimeline(
       collectionName: config.collectionName,
       customChain: config.customChain,
       executor: config.executor,
+      onStage: config.onStage,
+      onFallback: config.onFallback,
     });
 
     steps.push(step);

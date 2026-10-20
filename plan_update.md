@@ -568,7 +568,8 @@ Create `docs/memory/decisions/adr-003-theater.md` and update `docs/memory/constr
 | Camera | Isometric 2:1 like the Habbo reference; top-down WorkAdventure/TinyFloor behavior (walking, status tags, proximity interaction) | Pure top-down 16-bit |
 | Renderer | Canvas 2D, no engine | PixiJS v8 if you later need > 100 animated sprites |
 | Palette | Muted version of the reference (Section 4.4) | Faithful bright yellow/cyan/navy |
-| Story set | A-bold, A-anxious, B-balanced, B-workaholic | Any 4 of the 6 existing seeds |
+| Story set | A-bold, A-anxious, B-balanced, B-workaholic | Any 4 of the 6 existing
+ seeds |
 | Pacing | 150 s target, independent per-story queues with 1.6 s stagger | Strict lockstep rounds |
 | Agent to stage mapping | Section 4.6 | Rename or merge agents freely; keep verb mapping |
 | Audio | None in v1 | Optional muted-by-default cues later |
