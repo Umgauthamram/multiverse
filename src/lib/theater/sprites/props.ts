@@ -23,7 +23,8 @@ export function drawDesk(
   x: number,
   y: number,
   accentColor: string = THEATER_PALETTE.trim,
-  monitorData?: { label?: string; progress?: number; code?: string }
+  monitorData?: { label?: string; progress?: number; code?: string },
+  screenSource?: CanvasImageSource | null
 ): void {
   ctx.save();
   ctx.translate(x, y);
@@ -79,8 +80,15 @@ export function drawDesk(
   ctx.fillStyle = "#020617";
   ctx.fillRect(-14, -32, 28, 16);
 
-  // Tiny screen content representation
-  if (accentColor) {
+  // Draw real 48x32 monitor texture if available
+  if (screenSource) {
+    try {
+      ctx.drawImage(screenSource, -14, -32, 28, 16);
+    } catch {
+      // Fallback
+    }
+  } else if (accentColor) {
+    // Tiny screen content representation
     ctx.fillStyle = accentColor;
     ctx.fillRect(-12, -30, 8, 2);
     ctx.fillRect(-12, -26, 16, 2);
@@ -130,7 +138,12 @@ export function drawChair(ctx: CanvasRenderingContext2D, x: number, y: number): 
 /**
  * Draws reception desk for NEXUS.
  */
-export function drawReceptionDesk(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+export function drawReceptionDesk(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  screenSource?: CanvasImageSource | null
+): void {
   ctx.save();
   ctx.translate(x, y);
 
@@ -171,6 +184,18 @@ export function drawReceptionDesk(ctx: CanvasRenderingContext2D, x: number, y: n
   // Small receptionist sign
   ctx.fillStyle = THEATER_PALETTE.agentAccents.NEXUS;
   ctx.fillRect(-10, 6, 20, 4);
+
+  // Reception terminal screen if available
+  if (screenSource) {
+    ctx.fillStyle = "#0f172a";
+    ctx.fillRect(8, -26, 22, 15);
+    ctx.strokeRect(8, -26, 22, 15);
+    try {
+      ctx.drawImage(screenSource, 9, -25, 20, 13);
+    } catch {
+      // Fallback
+    }
+  }
 
   ctx.restore();
 }

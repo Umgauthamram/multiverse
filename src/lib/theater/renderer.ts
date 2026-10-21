@@ -32,6 +32,7 @@ import {
 } from "@/lib/theater/layout";
 import {
   createWalker,
+  setWalkerDestination,
   updateWalker,
   WalkerState,
 } from "@/lib/theater/pathfinding";
@@ -40,6 +41,7 @@ import {
   SceneState,
   StorySceneState,
 } from "@/lib/theater/sceneState";
+import { MonitorManager } from "@/lib/theater/sprites/screens";
 import {
   AnimationName,
   createAgentLookSpec,
@@ -99,9 +101,14 @@ export class TheaterRenderer {
   // Fonts ready flag
   private fontsLoaded = false;
 
+  // 8 FPS Monitor Screen Manager for 9 agents
+  private monitorManager = new MonitorManager();
+
   // Internal character walkers
   private youWalkers: Record<string, WalkerState> = {};
   private nexusWalker: WalkerState | null = null;
+  private lastForkedStoriesCount = 0;
+  private nexusWalkPhase: "idle" | "to_stairs" | "to_reception" | "to_corridor" = "idle";
 
   // Handoff packet animation state
   private handoffProgress = 0;
@@ -228,15 +235,38 @@ export class TheaterRenderer {
     }
     this.frameCount++;
 
-    // 3. Update walkers
+    // 3. Update 8 FPS Monitor Textures for all 9 agents
+    this.monitorManager.update(dt, state, this.focusedStoryId);
+
+    // 4. Update walkers & NEXUS special path sequences
     for (const walker of Object.values(this.youWalkers)) {
       updateWalker(walker, dt);
     }
+
     if (this.nexusWalker) {
       updateWalker(this.nexusWalker, dt);
+
+      // Trigger NEXUS walk on FORK
+      const storiesCount = state ? Object.keys(state.stories).length : 0;
+      if (storiesCount > this.lastForkedStoriesCount && this.nexusWalkPhase === "idle") {
+        this.lastForkedStoriesCount = storiesCount;
+        this.nexusWalkPhase = "to_stairs";
+        setWalkerDestination(this.nexusWalker, AGENT_OFFICE.anchors.stairs_top);
+      } else if (this.nexusWalkPhase === "to_stairs" && !this.nexusWalker.isMoving) {
+        this.nexusWalkPhase = "to_reception";
+        setWalkerDestination(this.nexusWalker, AGENT_OFFICE.anchors.reception);
+      } else if (this.nexusWalkPhase === "to_reception" && !this.nexusWalker.isMoving) {
+        this.nexusWalkPhase = "idle";
+      }
+
+      // Trigger NEXUS walk to Life Wing corridor on FINISH
+      if (state?.isFinished && this.nexusWalkPhase !== "to_corridor") {
+        this.nexusWalkPhase = "to_corridor";
+        setWalkerDestination(this.nexusWalker, { col: 8, row: 4, level: 0 });
+      }
     }
 
-    // 4. Update handoff packet
+    // 5. Update handoff packet
     if (state?.activeHandoff) {
       const key = `${state.activeHandoff.fromAgent}->${state.activeHandoff.toAgent}:${state.activeHandoff.quarter}`;
       if (this.currentHandoffKey !== key) {
@@ -512,22 +542,28 @@ export class TheaterRenderer {
     // 1. Reception Desk & NEXUS
     const recPt = AGENT_OFFICE.anchors.reception;
     const recScr = gridToScreen(recPt.col, recPt.row, 1);
+    const nexusScreen = this.monitorManager.getMonitorCanvas("NEXUS");
+
     entities.push({
       level: 1,
       col: recPt.col,
       row: recPt.row,
       sortOrderOffset: 1,
-      draw: (c) => drawReceptionDesk(c, recScr.x, recScr.y + 10),
+      draw: (c) => drawReceptionDesk(c, recScr.x, recScr.y + 10, nexusScreen),
     });
 
     const nexusState = state?.agents.NEXUS;
     const nexusWalker = this.nexusWalker;
     if (nexusWalker) {
       const nexusLook = createAgentLookSpec("NEXUS", THEATER_PALETTE.agentAccents.NEXUS);
+      const activeCoord = nexusWalker.path[nexusWalker.currentIndex] || recPt;
+      const nx = nexusWalker.currentPixel.x;
+      const ny = nexusWalker.currentPixel.y;
+
       entities.push({
-        level: 1,
-        col: recPt.col,
-        row: recPt.row,
+        level: activeCoord.level ?? 1,
+        col: activeCoord.col,
+        row: activeCoord.row,
         sortOrderOffset: 2,
         draw: (c) => {
           drawCharacterFrame(
@@ -536,11 +572,14 @@ export class TheaterRenderer {
             nexusWalker.isMoving ? "walk" : "idle",
             this.currentAnimFrame,
             nexusWalker.facing,
-            recScr.x - 16,
-            recScr.y - 14
+            nx - 16,
+            ny - 14
           );
-          if (nexusState?.speechBubble) {
-            this.drawSpeechBubble(c, recScr.x, recScr.y - 64, nexusState.speechBubble);
+          const bubbleText = state?.isFinished
+            ? "All lives complete"
+            : nexusState?.speechBubble;
+          if (bubbleText) {
+            this.drawSpeechBubble(c, nx, ny - 64, bubbleText);
           }
         },
       });
@@ -597,8 +636,9 @@ export class TheaterRenderer {
       const screenPt = gridToScreen(anchor.col, anchor.row, 1);
       const agentState = state?.agents[agentId];
       const accent = AGENT_ROSTER_INFO[agentId]?.accent || THEATER_PALETTE.trim;
+      const screenCanvas = this.monitorManager.getMonitorCanvas(agentId);
 
-      // Desk + Chair
+      // Desk + Chair + Live 48x32 CRT screen
       entities.push({
         level: 1,
         col: anchor.col,
@@ -606,9 +646,14 @@ export class TheaterRenderer {
         sortOrderOffset: 0,
         draw: (c) => {
           drawChair(c, screenPt.x, screenPt.y - 6);
-          drawDesk(c, screenPt.x, screenPt.y + 12, accent, {
-            label: agentState?.statusTag,
-          });
+          drawDesk(
+            c,
+            screenPt.x,
+            screenPt.y + 12,
+            accent,
+            { label: agentState?.statusTag },
+            screenCanvas
+          );
         },
       });
 
@@ -886,8 +931,25 @@ export class TheaterRenderer {
     const currX = fromScr.x + (toScr.x - fromScr.x) * t;
     const currY = fromScr.y + (toScr.y - fromScr.y) * t - 18;
 
+    const accent =
+      THEATER_PALETTE.agentAccents[state.activeHandoff.fromAgent] || "#0284c7";
+
     ctx.save();
     ctx.translate(currX, currY);
+
+    // Trailing accent dots behind moving packet
+    const dirX = fromScr.x - toScr.x;
+    const dirY = fromScr.y - toScr.y;
+    const len = Math.hypot(dirX, dirY) || 1;
+    const nx = dirX / len;
+    const ny = dirY / len;
+
+    ctx.fillStyle = accent;
+    for (let p = 1; p <= 3; p++) {
+      const px = nx * (p * 6);
+      const py = ny * (p * 6);
+      ctx.fillRect(px - 1, py - 1, 2, 2);
+    }
 
     // Small document icon with folded corner
     ctx.fillStyle = "#f8fafc";
@@ -896,11 +958,20 @@ export class TheaterRenderer {
     ctx.fillRect(-6, -8, 12, 16);
     ctx.strokeRect(-6, -8, 12, 16);
 
-    // Mini lines on document
-    ctx.fillStyle = "#0284c7";
-    ctx.fillRect(-4, -5, 8, 2);
-    ctx.fillRect(-4, -1, 6, 2);
-    ctx.fillRect(-4, 3, 7, 2);
+    // Folded top-right corner
+    ctx.fillStyle = "#cbd5e1";
+    ctx.beginPath();
+    ctx.moveTo(2, -8);
+    ctx.lineTo(6, -4);
+    ctx.lineTo(2, -4);
+    ctx.closePath();
+    ctx.fill();
+
+    // Mini lines on document in sending agent's accent
+    ctx.fillStyle = accent;
+    ctx.fillRect(-4, -5, 5, 2);
+    ctx.fillRect(-4, -1, 8, 2);
+    ctx.fillRect(-4, 3, 6, 2);
 
     ctx.restore();
   }
