@@ -34,6 +34,7 @@ import {
 import {
   createWalker,
   setWalkerDestination,
+  snapWalkerToDestination,
   updateWalker,
   WalkerState,
 } from "@/lib/theater/pathfinding";
@@ -105,6 +106,7 @@ export class TheaterRenderer {
   // Camera state
   private camera: Camera = createDefaultCamera();
   public focusedStoryId: string | null = null;
+  public reducedMotion = false;
 
   // Animation and tick tracking
   private animationFrameId: number | null = null;
@@ -243,6 +245,10 @@ export class TheaterRenderer {
     this.onRoomClick?.(storyId);
   }
 
+  public setReducedMotion(enabled: boolean): void {
+    this.reducedMotion = enabled;
+  }
+
   /**
    * Main simulation and animation state step.
    * dt is elapsed time in milliseconds.
@@ -255,8 +261,14 @@ export class TheaterRenderer {
       this.camera.targetZoom = 1.05;
     }
 
-    // 1. Smooth camera easing
-    updateCamera(this.camera, dt, 8);
+    // 1. Camera easing or instant snap for reduced motion
+    if (this.reducedMotion) {
+      this.camera.x = this.camera.targetX;
+      this.camera.y = this.camera.targetY;
+      this.camera.zoom = this.camera.targetZoom;
+    } else {
+      updateCamera(this.camera, dt, 8);
+    }
 
     // 2. Global animation frame timer (~4 fps for idle character bobs)
     this.animTimer += dt;
@@ -271,11 +283,19 @@ export class TheaterRenderer {
 
     // 4. Update walkers & NEXUS special path sequences
     for (const walker of Object.values(this.youWalkers)) {
-      updateWalker(walker, dt);
+      if (this.reducedMotion && walker.isMoving) {
+        snapWalkerToDestination(walker);
+      } else {
+        updateWalker(walker, dt);
+      }
     }
 
     if (this.nexusWalker) {
-      updateWalker(this.nexusWalker, dt);
+      if (this.reducedMotion && this.nexusWalker.isMoving) {
+        snapWalkerToDestination(this.nexusWalker);
+      } else {
+        updateWalker(this.nexusWalker, dt);
+      }
 
       // Trigger NEXUS walk on FORK
       const storiesCount = state ? Object.keys(state.stories).length : 0;
@@ -298,7 +318,10 @@ export class TheaterRenderer {
     }
 
     // 5. Update handoff packet
-    if (state?.activeHandoff) {
+    if (this.reducedMotion) {
+      this.currentHandoffKey = null;
+      this.handoffProgress = 0;
+    } else if (state?.activeHandoff) {
       const key = `${state.activeHandoff.fromAgent}->${state.activeHandoff.toAgent}:${state.activeHandoff.quarter}`;
       if (this.currentHandoffKey !== key) {
         this.currentHandoffKey = key;
@@ -312,7 +335,7 @@ export class TheaterRenderer {
     }
 
     // 6. Life Wing State Reactions: Cash Delta & Stat Clamping Text Pops
-    if (state?.stories) {
+    if (!this.reducedMotion && state?.stories) {
       for (const [storyId, story] of Object.entries(state.stories)) {
         const prevSavings = this.lastSavings[storyId];
         if (prevSavings !== undefined && story.currentSavings !== prevSavings) {
@@ -362,11 +385,15 @@ export class TheaterRenderer {
       }
     }
 
-    // Advance floating text pops
-    for (const pop of this.textPops) {
-      pop.progress += dt / pop.durationMs;
+    if (this.reducedMotion) {
+      this.textPops = [];
+    } else {
+      // Advance floating text pops
+      for (const pop of this.textPops) {
+        pop.progress += dt / pop.durationMs;
+      }
+      this.textPops = this.textPops.filter((p) => p.progress < 1.0);
     }
-    this.textPops = this.textPops.filter((p) => p.progress < 1.0);
 
     // 7. Cast NPCs Lifecycle & Pathing
     if (state?.cast) {
@@ -387,7 +414,11 @@ export class TheaterRenderer {
         }
 
         if (castWalker) {
-          updateWalker(castWalker, dt);
+          if (this.reducedMotion && castWalker.isMoving) {
+            snapWalkerToDestination(castWalker);
+          } else {
+            updateWalker(castWalker, dt);
+          }
 
           if (castWalker.phase === "entering" && !castWalker.isMoving) {
             castWalker.phase = "interacting";
@@ -473,7 +504,7 @@ export class TheaterRenderer {
     }
 
     // 4. Draw active handoff packet between desks
-    if (state?.activeHandoff && this.handoffProgress < 1.0) {
+    if (!this.reducedMotion && state?.activeHandoff && this.handoffProgress < 1.0) {
       this.drawHandoffPacket(ctx, state);
     }
 
@@ -481,8 +512,10 @@ export class TheaterRenderer {
     this.drawRoomBanners(ctx, state);
 
     // 6. Draw active floating text pops (cash deltas and stat hits)
-    for (const pop of this.textPops) {
-      drawFloatingTextPop(ctx, pop.pixelX, pop.pixelY, pop.text, pop.color, pop.progress);
+    if (!this.reducedMotion) {
+      for (const pop of this.textPops) {
+        drawFloatingTextPop(ctx, pop.pixelX, pop.pixelY, pop.text, pop.color, pop.progress);
+      }
     }
 
     ctx.restore(); // Restore Camera Transform

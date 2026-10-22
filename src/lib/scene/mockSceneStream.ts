@@ -29,10 +29,13 @@ import { formatLine } from "@/lib/scene/sceneLanguage";
 
 export type MockStreamSpeed = "instant" | "realistic" | "slow" | "stalled";
 
+export type DemoScenario = "normal" | "reroute" | "error" | "stall" | "fast";
+
 export interface MockSceneStreamOptions {
   speed?: MockStreamSpeed;
   sessionId?: string;
   intake?: Partial<IntakeFormValues>;
+  scenario?: DemoScenario;
   injectReroute?: boolean;
   injectError?: boolean;
 }
@@ -65,6 +68,9 @@ const DEFAULT_INTAKE: IntakeFormValues = {
  * Generates the complete, ordered array of Scene lines for a 4-story x 20-quarter simulation.
  */
 export function generateMockSceneLines(options: MockSceneStreamOptions = {}): string[] {
+  const isRerouteScenario = options.scenario === "reroute" || !!options.injectReroute;
+  const isErrorScenario = options.scenario === "error" || !!options.injectError;
+
   const sessionId = options.sessionId || `demo-${Date.now()}`;
   const intake: IntakeFormValues = { ...DEFAULT_INTAKE, ...options.intake };
   const lines: string[] = [];
@@ -177,7 +183,7 @@ export function generateMockSceneLines(options: MockSceneStreamOptions = {}): st
       );
 
       // Optional failure injection: REROUTE
-      if (options.injectReroute && q === 3 && story.storyId === "S1") {
+      if (isRerouteScenario && q === 3 && story.storyId === "S1") {
         lines.push(formatLine(compileReroute("groq", "nvidia")));
       }
 
@@ -234,7 +240,7 @@ export function generateMockSceneLines(options: MockSceneStreamOptions = {}): st
       lines.push(formatLine(compileProgress(totalDoneQuarters, 80)));
 
       // Optional failure injection: ERROR
-      if (options.injectError && q === 7 && story.storyId === "S2") {
+      if (isErrorScenario && q === 7 && story.storyId === "S2") {
         lines.push(formatLine(compileError(story.storyId, q, "RATE_LIMIT_EXHAUSTED")));
       }
     }
@@ -262,7 +268,12 @@ export function generateMockSceneLines(options: MockSceneStreamOptions = {}): st
  * Creates a mock scene stream matching the SSE subscribe signature.
  */
 export function createMockSceneStream(options: MockSceneStreamOptions = {}): MockSceneStream {
-  const speed = options.speed || "realistic";
+  let speed = options.speed || "realistic";
+  if (options.scenario === "stall") {
+    speed = "stalled";
+  } else if (options.scenario === "fast") {
+    speed = "instant";
+  }
   const allLines = generateMockSceneLines(options);
 
   return {

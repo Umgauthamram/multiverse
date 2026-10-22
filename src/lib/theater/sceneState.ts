@@ -11,6 +11,7 @@
 import { parseLine, renderTickerText, ParsedSceneLine } from "@/lib/scene/sceneLanguage";
 import { PersonaSeedType } from "@/lib/simulation/personaSeeder";
 import { LifeStats } from "@/lib/simulation/statClamper";
+import { inspectForCrisis } from "@/lib/safety/crisisInterceptor";
 
 export type AgentId =
   | "RONIN"
@@ -592,7 +593,9 @@ export function reduceSceneState(state: SceneState, rawLine: string | ParsedScen
 
     case "SAY": {
       if (!storyId) break;
-      const text = String(args.text || "");
+      const rawText = String(args.text || "");
+      const isCrisis = inspectForCrisis(rawText).isCrisis;
+      const text = isCrisis ? "..." : rawText;
 
       if (nextState.stories[storyId]) {
         nextState.stories[storyId] = {

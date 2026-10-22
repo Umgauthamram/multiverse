@@ -220,3 +220,17 @@ export function updateWalker(walker: WalkerState, dtMs: number): void {
     y: fromPixel.y + (toPixel.y - fromPixel.y) * t,
   };
 }
+
+/**
+ * Instantly snaps a walker to the end of its current path (used for reduced motion).
+ */
+export function snapWalkerToDestination(walker: WalkerState): void {
+  if (walker.path.length > 0) {
+    walker.currentIndex = walker.path.length - 1;
+    walker.segmentProgress = 0;
+    walker.isMoving = false;
+    const finalCoord = walker.path[walker.path.length - 1];
+    walker.currentPixel = gridToScreen(finalCoord.col, finalCoord.row, finalCoord.level || 0);
+  }
+}
+

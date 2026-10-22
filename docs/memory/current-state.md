@@ -15,15 +15,15 @@
 
 ## 2. Active Feature / Milestone
 - **Current Focus**: Multiverse Theater — Live Simulation Visualization Layer
-- **Status**: Theater Phase 1 through Phase 8 (Reveal Sequence, Life Cards, page flow integration, 4-timeline tree & finale) completed; verified across 45 test suites (282 unit tests passing), `eslint` 0 warnings, TypeScript 0 errors, and Next.js production build passing
-- Next up: Theater Phase 9 (Perf, reduced motion, failure scenes, `?demo=1` scenarios)
+- **Status**: Theater Phase 1 through Phase 9 (Perf, reduced motion, failure scenes, demo scenarios, safety crisis interception, director timeout safeguard) completed; verified across 46 test suites (292 unit tests passing), `eslint` 0 warnings, TypeScript 0 errors, and Next.js production build passing
+- Next up: Theater Phase 10 (ADR, constraints amendment, memory docs, README section)
 
 ## 3. Recent Progress (Rolling Snapshot - Max 5)
+- Theater Phase 9: Perf, reduced motion, failure scenes, `?demo=1` scenarios (`TheaterView.tsx`, `TheaterCanvas.tsx`, `renderer.ts`, `pathfinding.ts`, `director.ts`, `sceneLanguage.ts`, `sceneState.ts`, `mockSceneStream.ts`, tests: `theaterPhase9.test.ts`)
 - Theater Phase 8: Reveal, Life Cards, page flow, 4-timeline tree and finale (`src/components/theater/LifeCards.tsx`, `renderer.ts`, `TheaterView.tsx`, `src/app/page.tsx`, `simulationOrchestrator.ts`, tests: `lifeCards.test.tsx`, `theaterReveal.test.tsx`)
 - Theater Phase 7: Theater UI & Master View (`src/components/theater/LiveTicker.tsx`, `TheaterCanvas.tsx`, `StoryFocusBar.tsx`, `TheaterView.tsx`, tests: `theaterUI.test.tsx`)
 - Theater Phase 6: Life Wing: 4 Rooms & Visual State Dynamics (`src/lib/theater/sprites/props.ts`, `renderer.ts`, tests: `lifeWing.test.ts`)
 - Theater Phase 5: Agent Office Visuals & 9 Monitor Screens (`src/lib/theater/sprites/screens.ts`, `renderer.ts`, `props.ts`, tests: `screens.test.ts`, `agentOffice.test.ts`)
-- Theater Phase 4: Renderer Core & Procedural Sprites (`src/lib/theater/tokens.ts`, `iso.ts`, `layout.ts`, `pathfinding.ts`, `sprites/characterGenerator.ts`, `sprites/props.ts`, `renderer.ts`, tests: `layout.test.ts`, `pathfinding.test.ts`, `rendererSmoke.test.ts`)
 
 ## 4. Next Immediate Steps
 - [x] Theater Phase 1: Scene Language, Compiler & Story Seeds
@@ -34,6 +34,7 @@
 - [x] Theater Phase 6: Life Wing: 4 rooms, state visuals, event scenes, cast NPCs, text pops
 - [x] Theater Phase 7: `TheaterView`, `LiveTicker`, focus camera, Skip, mobile layout, a11y
 - [x] Theater Phase 8: Reveal, Life Cards, page flow, 4-timeline tree and finale
-- [ ] Theater Phase 9: Perf, reduced motion, failure scenes, `?demo=1` scenarios
+- [x] Theater Phase 9: Perf, reduced motion, failure scenes, `?demo=1` scenarios
+- [ ] Theater Phase 10: ADR, constraints amendment, memory docs, README section
 
 

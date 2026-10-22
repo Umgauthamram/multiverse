@@ -20,6 +20,7 @@ export interface DirectorConfig {
   beatMs?: number;
   staggerMs?: number;
   maxTheaterMs?: number;
+  hardTimeoutMs?: number;
   onStateChange?: (state: SceneState) => void;
   onLineDispatched?: (line: string, parsed: ParsedSceneLine) => void;
   onRevealReady?: () => void;
@@ -71,6 +72,7 @@ export class TheaterDirector {
   private beatMs: number;
   private staggerMs: number;
   private maxTheaterMs: number;
+  private hardTimeoutMs: number;
   private startTime: number | null = null;
 
   private state: SceneState;
@@ -91,6 +93,7 @@ export class TheaterDirector {
     this.beatMs = config.beatMs || (this.reducedMotion ? 3000 : 6500);
     this.staggerMs = config.staggerMs ?? (this.reducedMotion ? 200 : 600);
     this.maxTheaterMs = config.maxTheaterMs || 150000;
+    this.hardTimeoutMs = config.hardTimeoutMs || 240000;
 
     this.onStateChange = config.onStateChange;
     this.onLineDispatched = config.onLineDispatched;
@@ -206,6 +209,22 @@ export class TheaterDirector {
     }
 
     const elapsed = currentTime - this.startTime;
+
+    // Hard timeout safety gate (Section 3: THEATER_HARD_TIMEOUT_MS)
+    if (elapsed >= this.hardTimeoutMs && !this.revealTriggered) {
+      this.finishReceived = true;
+      for (const track of this.tracks.values()) {
+        track.isCompleted = true;
+      }
+      while (this.pendingFinaleLines.length > 0) {
+        const fLine = this.pendingFinaleLines.shift()!;
+        this.applyLine(fLine);
+      }
+      this.revealTriggered = true;
+      this.onRevealReady?.();
+      return;
+    }
+
     const is3xSpeed = elapsed >= this.maxTheaterMs;
     const currentBeatDuration = is3xSpeed ? Math.max(800, Math.floor(this.beatMs / 3)) : this.beatMs;
 
@@ -238,7 +257,8 @@ export class TheaterDirector {
         }
       }
 
-      const quarterElapsed = currentTime - (track.quarterStartTime || currentTime);
+      const quarterElapsed =
+        currentTime - (track.quarterStartTime !== null ? track.quarterStartTime : currentTime);
       const subBeatRatio = is3xSpeed ? 0.333 : 1.0;
 
       // Dispatch lines for matching sub-beats

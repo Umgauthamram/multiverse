@@ -8,6 +8,7 @@ interface TheaterCanvasProps {
   sceneState: SceneState;
   focusedStoryId?: string | null;
   onFocusChange?: (storyId: string | null) => void;
+  reducedMotion?: boolean;
   className?: string;
 }
 
@@ -15,6 +16,7 @@ export function TheaterCanvas({
   sceneState,
   focusedStoryId = null,
   onFocusChange,
+  reducedMotion = false,
   className = "",
 }: TheaterCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,6 +38,15 @@ export function TheaterCanvas({
     }
   }, [focusedStoryId]);
 
+  // Synchronize reduced motion when prop changes
+  const reducedMotionRef = useRef(reducedMotion);
+  useEffect(() => {
+    reducedMotionRef.current = reducedMotion;
+    if (rendererRef.current) {
+      rendererRef.current.setReducedMotion(reducedMotion);
+    }
+  }, [reducedMotion]);
+
   // Initialize TheaterRenderer, attach to canvas, setup resize observer and render loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,6 +54,7 @@ export function TheaterCanvas({
     if (!canvas || !container) return;
 
     const renderer = new TheaterRenderer();
+    renderer.setReducedMotion(reducedMotionRef.current);
     rendererRef.current = renderer;
 
     // Attach to HTML5 Canvas

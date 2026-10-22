@@ -13,6 +13,8 @@ export interface SceneScope {
   quarter?: number;
 }
 
+import { inspectForCrisis } from "@/lib/safety/crisisInterceptor";
+
 export type SceneVerb =
   | "BOOT"
   | "FORK"
@@ -434,6 +436,13 @@ export function validateLine(line: string): boolean {
  * Returns null if the verb is silent/internal (e.g. DONE, PROGRESS).
  */
 export function renderTickerText(line: ParsedSceneLine): string | null {
+  if (line.verb === "SAY") {
+    const raw = String(line.args.text || "");
+    if (inspectForCrisis(raw).isCrisis) {
+      return null;
+    }
+  }
+
   const verbDef = VERBS[line.verb];
   if (!verbDef || !verbDef.tickerTemplate) {
     return null;

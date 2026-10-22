@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { TheaterDirector } from "@/lib/theater/director";
 import { SceneState, createInitialSceneState, INITIAL_AGENTS, AgentId } from "@/lib/theater/sceneState";
-import { createMockSceneStream } from "@/lib/scene/mockSceneStream";
+import { createMockSceneStream, DemoScenario } from "@/lib/scene/mockSceneStream";
 import { TheaterCanvas } from "./TheaterCanvas";
 import { LiveTicker } from "./LiveTicker";
 import { StoryFocusBar } from "./StoryFocusBar";
@@ -39,6 +39,33 @@ export function TheaterView({
   const [isSkipping, setIsSkipping] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const [isMobileTickerOpen, setIsMobileTickerOpen] = useState(false);
+  const [systemReducedMotion, setSystemReducedMotion] = useState(() => {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+    return false;
+  });
+  const [demoScenario] = useState<DemoScenario | undefined>(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const scen = params.get("scenario") as DemoScenario | null;
+      if (scen && ["normal", "reroute", "error", "stall", "fast"].includes(scen)) {
+        return scen;
+      }
+    }
+    return undefined;
+  });
+
+  // Auto-detect OS prefers-reduced-motion changes
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = (e: MediaQueryListEvent) => setSystemReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const effectiveReducedMotion = reducedMotion || systemReducedMotion;
 
   const directorRef = useRef<TheaterDirector | null>(null);
   const allLinesRef = useRef<string[]>([]);
@@ -46,7 +73,7 @@ export function TheaterView({
   // Initialize Director & timer
   useEffect(() => {
     const director = new TheaterDirector({
-      reducedMotion,
+      reducedMotion: effectiveReducedMotion,
       onStateChange: (newState) => {
         setSceneState({ ...newState });
       },
@@ -74,7 +101,7 @@ export function TheaterView({
       director.destroy();
       directorRef.current = null;
     };
-  }, [reducedMotion, onRevealReady]);
+  }, [effectiveReducedMotion, onRevealReady]);
 
   // Connect to SSE stream or mock scene stream
   useEffect(() => {
@@ -86,6 +113,7 @@ export function TheaterView({
       const mockStream = createMockSceneStream({
         speed: "realistic",
         sessionId: sessionId || "demo-theater",
+        scenario: demoScenario,
       });
 
       const unsubscribe = mockStream.subscribe((lines) => {
@@ -127,7 +155,7 @@ export function TheaterView({
         eventSource.close();
       };
     }
-  }, [sessionId, streamUrl, useMock]);
+  }, [sessionId, streamUrl, useMock, demoScenario]);
 
   // Handle Skip action (instant jump to reveal)
   const handleSkip = () => {
@@ -287,6 +315,7 @@ export function TheaterView({
                 sceneState={sceneState}
                 focusedStoryId={focusedStoryId}
                 onFocusChange={setFocusedStoryId}
+                reducedMotion={effectiveReducedMotion}
               />
             </div>
           </section>
