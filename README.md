@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.4-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![Vitest](https://img.shields.io/badge/Tests-45%20Suites%20%7C%20282%20Passing-emerald)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Tests-46%20Suites%20%7C%20292%20Passing-emerald)](https://vitest.dev/)
 
 ---
 
@@ -49,6 +49,9 @@ The platform combines:
 - **Floor 2 (Agent Office)** ([`src/lib/theater/sprites/screens.ts`](src/lib/theater/sprites/screens.ts)): 9 animated agents with live monitor textures displaying running code, financial formula calculations, and test assertions.
 - **Floor 1 (Life Wing)**: 4 parallel story rooms responding to incoming Scene Language events with dynamic lighting, avatar walking, NPC visits, furniture degradation/upgrades, and text bubbles.
 - **A\* Grid Pathfinding** ([`src/lib/theater/pathfinding.ts`](src/lib/theater/pathfinding.ts)): 2D isometric obstacle avoidance for characters navigating between desks, doors, and social hubs.
+- **Accessibility & Reduced Motion**: Full automatic detection of OS `prefers-reduced-motion: reduce` with instant coordinate snapping, zero walking interpolation, suppressed packet/pop animations, and relaxed 3-second beat pacing.
+- **Resilience & Demo Scenarios**: Interactive testing via `?demo=1&scenario=reroute | error | stall | fast` with NEXUS provider rerouting and SPARK rate-limit recovery.
+- **LLM Safety Guardrail**: In-flight crisis interception (`inspectForCrisis`) filtering self-harm language from public ticker feeds and redacting diary entries to `"..."`.
 - **Reveal Sequence & Life Cards** ([`src/components/theater/LifeCards.tsx`](src/components/theater/LifeCards.tsx)): End-of-simulation sequence with camera pullback, upper floor dimming, final room stat banners, and interactive cards displaying net worth, clamped stat bars, and status badges.
 - **Zero-Network Theater Replay**: Cached scene-operation pipeline allowing instant offline replay of completed simulations.
 
@@ -97,11 +100,19 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
    - Observe the 4 parallel life paths unfold across the 4 rooms on Floor 1.
 4. When the simulation completes, inspect the **Life Cards**, click **"Compare All 4 Futures"** to navigate the interactive **2D Branching Tree**, or click **"Open Finale Report"** to review the regret matrix.
 
+### Demo Scenarios & Query Parameters
+To test failure handling and playback modes without live AI quota:
+- `http://localhost:3000/?demo=1&scenario=normal`: Standard realistic mock simulation stream (default).
+- `http://localhost:3000/?demo=1&scenario=reroute`: Simulates an upstream provider outage triggering NEXUS to dynamically reroute providers with ticker notifications.
+- `http://localhost:3000/?demo=1&scenario=error`: Simulates an LLM rate-limit exhaustion error on SPARK with status changes and recovery.
+- `http://localhost:3000/?demo=1&scenario=stall`: Simulates a stalled stream testing director 3x speedup and 4-minute hard timeout safeguards.
+- `http://localhost:3000/?demo=1&scenario=fast`: High-speed stream completing in ~2 seconds for rapid CI verification.
+
 ---
 
 ## 4. Which Tests Were Run & What They Verified
 
-The codebase is backed by **45 Vitest test suites containing 282 automated unit, integration, and UI tests**, running with 100% pass rates in under 3.5s.
+The codebase is backed by **46 Vitest test suites containing 292 automated unit, integration, and UI tests**, running with 100% pass rates in under 3.5s.
 
 ```bash
 # Run all unit and integration tests
@@ -138,6 +149,7 @@ npm run ci
 | | `tests/unit/agentOffice.test.ts` | Floor 2 agent positioning, status tags, packet handoffs, and walking paths. |
 | | `tests/unit/lifeWing.test.ts` | Floor 1 room state rendering, visitor NPCs, and furniture dynamics. |
 | | `tests/unit/rendererSmoke.test.ts` | Headless HTML5 Canvas context rendering without exceptions. |
+| | `tests/unit/theaterPhase9.test.ts` | Reduced motion snapping, failure scenes (REROUTE/ERROR), demo scenarios, crisis redaction, and director safeguards. |
 | **Scene Language & Streaming** | `tests/unit/sceneLanguage.test.ts` | Scene language grammar parsing, serialization, and syntax validation. |
 | | `tests/unit/sceneCompiler.test.ts` | Compiling timeline step deltas into ISO scene command streams. |
 | | `tests/unit/sceneState.test.ts` | Deterministic reducer updates from incoming scene op lines. |

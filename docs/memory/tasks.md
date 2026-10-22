@@ -51,9 +51,10 @@
 - [x] Theater Phase 7: `TheaterView`, `LiveTicker`, focus camera, Skip, mobile layout, a11y (`src/components/theater/`, tests: `theaterUI.test.tsx`)
 - [x] Theater Phase 8: Reveal, Life Cards, page flow, 4-timeline tree and finale (`src/components/theater/LifeCards.tsx`, `renderer.ts`, `TheaterView.tsx`, `src/app/page.tsx`, `simulationOrchestrator.ts`, tests: `lifeCards.test.tsx`, `theaterReveal.test.tsx`)
 - [x] Theater Phase 9: Perf, reduced motion, failure scenes, `?demo=1` scenarios (reduced motion auto-detect & snapping, SAY crisis safety interception, `createMockSceneStream` demo scenarios, director timeout safeguard, tests: `theaterPhase9.test.ts`)
+- [x] Theater Phase 10: ADR, constraints amendment, memory docs, README section (`docs/memory/decisions/adr-003-theater.md`, `constraints.md`, `rejected.md`, `README.md`, `tasks.md`, `current-state.md`)
 
 ## Active Tasks
-- [ ] Theater Phase 10: ADR, constraints amendment, memory docs, README section
+- None (All 30 Core Engine & 10 Theater Milestone Phases Completed)
 
-## Backlog (Upcoming Theater Phases)
-- [ ] Theater Phase 10: ADR, constraints amendment, memory docs, README section
+## Backlog (Future Milestones)
+- Future enhancements (e.g. sound cues, audio layer, additional persona archetypes)
