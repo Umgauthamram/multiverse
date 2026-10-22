@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import Image from "next/image";
 import { IntakeForm } from "@/components/intake/IntakeForm";
 import { IntakeFormValues, DEFAULT_INTAKE_VALUES } from "@/lib/schemas/intake";
 import { TheaterView } from "@/components/theater/TheaterView";
@@ -23,11 +24,24 @@ import {
 } from "@/lib/simulation/simulationOrchestrator";
 import { TimelineStepDocument } from "@/lib/db/models/Simulation";
 import { PersonaSeedType } from "@/lib/simulation/personaSeeder";
+import { AuthProvider } from "@/lib/auth/authContext";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 type AppViewMode = "welcome" | "intake" | "theater" | "multiverse" | "finale";
 
 export default function Home() {
+  return (
+    <AuthProvider>
+      <HomeContent />
+    </AuthProvider>
+  );
+}
+
+function HomeContent() {
   const [viewMode, setViewMode] = useState<AppViewMode>("welcome");
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<"login" | "signup">("login");
   const [intakeData, setIntakeData] = useState<IntakeFormValues>(DEFAULT_INTAKE_VALUES);
   const [simData, setSimData] = useState<SimulatedMultiverseData | null>(null);
   const [sessionId, setSessionId] = useState<string>("sim-live");
@@ -258,19 +272,24 @@ export default function Home() {
     <main className="min-h-screen flex flex-col justify-between p-4 sm:p-6 md:p-10 max-w-7xl mx-auto selection:bg-emerald-500/20">
       {/* Top Header */}
       <header className="flex items-center justify-between border-b border-zinc-800 pb-4 mb-6">
+        {/* Brand with Black & White Rounded Logo */}
         <div className="flex items-center gap-3">
-          <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-widest font-bold text-zinc-200">
-              Multiverse You
-            </span>
-            <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">
-              Reflective Simulation Engine • Not a Future Prediction
-            </span>
+          <div className="relative w-9 h-9 rounded-full overflow-hidden border border-zinc-700/80 shadow-md bg-zinc-900 shrink-0 flex items-center justify-center">
+            <Image
+              src="/logo.png"
+              alt="Multiverse Logo"
+              width={36}
+              height={36}
+              className="w-full h-full object-cover"
+              priority
+            />
           </div>
+          <span className="text-base font-semibold tracking-tight text-zinc-100 hover:text-white transition">
+            Multiverse
+          </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
           {viewMode === "theater" && (
             <button
               type="button"
@@ -311,17 +330,17 @@ export default function Home() {
             </button>
           )}
 
-          <div className="text-[11px] text-zinc-300 font-mono bg-zinc-900 px-2.5 py-1 rounded border border-zinc-800 hidden md:block">
-            {viewMode === "welcome"
-              ? "Phase 30: Ready"
-              : viewMode === "intake"
-              ? "Profiler Active"
-              : viewMode === "theater"
-              ? "Live Multiverse Theater"
-              : viewMode === "multiverse"
-              ? "4 Parallel Timelines"
-              : "Finale Synthesis"}
-          </div>
+          {/* Login and Signup Authentication Setup */}
+          <UserMenu
+            onOpenLogin={() => {
+              setAuthModalMode("login");
+              setIsAuthModalOpen(true);
+            }}
+            onOpenSignup={() => {
+              setAuthModalMode("signup");
+              setIsAuthModalOpen(true);
+            }}
+          />
         </div>
       </header>
 
@@ -532,7 +551,7 @@ export default function Home() {
       {/* Bottom Footer Info */}
       <footer className="border-t border-zinc-800 pt-5 mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs text-zinc-500">
         <div>Typography: Poppins • Palette: Warm Slate • Stack: Next.js 16, TypeScript, Tailwind CSS v4</div>
-        <div className="font-mono">Multiverse You • Anti-AI-Slop Certified Engine</div>
+        <div className="font-mono">Multiverse • Anti-AI-Slop Certified Engine</div>
       </footer>
 
       {/* Safety Crisis Intervention Guardrail Modal */}
@@ -542,6 +561,13 @@ export default function Home() {
         category={crisisInfo.category}
         matchedPattern={crisisInfo.matchedPattern}
         helplines={crisisInfo.helplines}
+      />
+
+      {/* Login & Signup Modal Dialog */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authModalMode}
       />
     </main>
   );

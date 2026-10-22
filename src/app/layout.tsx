@@ -10,9 +10,13 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Multiverse You — Counterfactual Decision Simulation",
+  title: "Multiverse — Counterfactual Decision Simulation",
   description:
-    "Fork a real-world dilemma into 12 parallel simulated futures. A reflective cognitive simulation tool, not a prediction.",
+    "Fork a real-world dilemma into parallel simulated futures. A reflective cognitive simulation tool, not a prediction.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
