@@ -180,7 +180,7 @@ export function serializeSimulationDigest(input: SimulationDigestInput): Simulat
   sections.push("");
 
   // 2. Structured Markdown Digest Table
-  sections.push(`### 12-Timeline Comparative Matrix`);
+  sections.push(`### ${input.timelines.length}-Timeline Comparative Matrix`);
   sections.push(
     `| Timeline | Path | Seed | Final Net Worth | Peak Happiness | Lowest Happiness | Burnout Month | Critical Shocks |`
   );

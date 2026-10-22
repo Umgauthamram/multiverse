@@ -238,5 +238,63 @@ describe("Phase 28: Finale Screen & Regret Heatmap Visualization", () => {
       // Anti-AI-slop compliance verification
       assertAntiSlopCompliance(html);
     });
+
+    it("renders finale report with 4 canonical timelines (T1 to T4) seamlessly", () => {
+      const canonical4Timelines: FinaleTimelineInput[] = [
+        {
+          timelineId: "S1",
+          branchOption: "A",
+          branchName: "London AI Startup",
+          branchLocation: "London, UK",
+          personaSeed: "bold",
+          finalSavings: 150000,
+        },
+        {
+          timelineId: "S2",
+          branchOption: "A",
+          branchName: "London AI Startup",
+          branchLocation: "London, UK",
+          personaSeed: "anxious",
+          finalSavings: 90000,
+        },
+        {
+          timelineId: "S3",
+          branchOption: "B",
+          branchName: "Delhi Corporate Lead",
+          branchLocation: "Delhi, India",
+          personaSeed: "balanced",
+          finalSavings: 110000,
+        },
+        {
+          timelineId: "S4",
+          branchOption: "B",
+          branchName: "Delhi Corporate Lead",
+          branchLocation: "Delhi, India",
+          personaSeed: "workaholic",
+          finalSavings: 140000,
+        },
+      ];
+
+      const html = renderToString(
+        <FinaleReportView
+          report={mockReport}
+          decisionPrompt="Should I join the London startup or stay in Delhi?"
+          optionA={{ name: "London AI Startup", location: "London, UK" }}
+          optionB={{ name: "Delhi Corporate Lead", location: "Delhi, India" }}
+          timelines={canonical4Timelines}
+          steps={mockSteps}
+          onRestart={() => {}}
+          onExploreTree={() => {}}
+        />
+      );
+
+      const cleanHtml = html.replace(/<!--.*?-->/g, "");
+
+      expect(cleanHtml).toContain("5-Year Counterfactual Synthesis");
+      expect(cleanHtml).toContain("Interactive Regret Heatmap Matrix");
+      expect(cleanHtml).toContain("T1");
+      expect(cleanHtml).toContain("T4");
+      assertAntiSlopCompliance(html);
+    });
   });
 });

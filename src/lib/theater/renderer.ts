@@ -248,6 +248,13 @@ export class TheaterRenderer {
    * dt is elapsed time in milliseconds.
    */
   public update(dt: number, state?: SceneState): void {
+    // Camera pullback to Life Wing during reveal if no room is specifically focused (Section 10)
+    if (state?.isFinished && !this.focusedStoryId) {
+      this.camera.targetX = 0;
+      this.camera.targetY = 160;
+      this.camera.targetZoom = 1.05;
+    }
+
     // 1. Smooth camera easing
     updateCamera(this.camera, dt, 8);
 
@@ -423,6 +430,25 @@ export class TheaterRenderer {
     // 1. Draw static floors, corridors, and architectural walls
     this.drawStaticFloorsAndWalls(ctx);
 
+    // Floor 2 (Agent Office) Dimming during Reveal (Section 10: dims to 40% opacity)
+    if (state?.isFinished) {
+      ctx.save();
+      const pN = gridToScreen(0, 0, 1);
+      const pE = gridToScreen(16, 0, 1);
+      const pS = gridToScreen(16, 10, 1);
+      const pW = gridToScreen(0, 10, 1);
+      ctx.fillStyle = "#0b0f19";
+      ctx.globalAlpha = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(pN.x, pN.y);
+      ctx.lineTo(pE.x, pE.y);
+      ctx.lineTo(pS.x, pS.y);
+      ctx.lineTo(pW.x, pW.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
     // 2. Draw room status floor tints and 2px borders
     this.drawRoomStatusFrames(ctx, state);
 
@@ -434,9 +460,16 @@ export class TheaterRenderer {
     // Painter's algorithm sort
     entities.sort(compareDepth);
 
-    // Draw entities in sorted order
+    // Draw entities in sorted order (office entities at 40% opacity when finished)
     for (const entity of entities) {
-      entity.draw(ctx);
+      if (entity.level === 1 && state?.isFinished) {
+        ctx.save();
+        ctx.globalAlpha = 0.4;
+        entity.draw(ctx);
+        ctx.restore();
+      } else {
+        entity.draw(ctx);
+      }
     }
 
     // 4. Draw active handoff packet between desks
@@ -1189,8 +1222,15 @@ export class TheaterRenderer {
       const persona = storyState?.personaSeed || "bold";
       const savings = storyState?.currentSavings ?? 25000;
       const formattedCash = `$${Math.round(savings).toLocaleString()}`;
-
-      const bannerText = `${storyId} • Path ${opt} (${persona}) • ${formattedCash}`;
+      let bannerText: string;
+      if (storyState?.finished || state?.isFinished) {
+        const stats = storyState?.stats || { happiness: 50, health: 50, relationships: 50, career: 50 };
+        const locName = storyState?.location ? storyState.location.split(",")[0] : `Path ${opt}`;
+        const personaCap = persona.charAt(0).toUpperCase() + persona.slice(1);
+        bannerText = `${storyId}  ${locName} / ${personaCap}  Final: ${formattedCash}  Joy ${stats.happiness}  Health ${stats.health}  Rel ${stats.relationships}  Career ${stats.career}`;
+      } else {
+        bannerText = `${storyId} • Path ${opt} (${persona}) • ${formattedCash}`;
+      }
 
       const fontStr = this.fontsLoaded ? "600 11px Poppins, sans-serif" : "600 11px sans-serif";
       ctx.font = fontStr;

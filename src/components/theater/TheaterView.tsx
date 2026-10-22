@@ -7,12 +7,15 @@ import { createMockSceneStream } from "@/lib/scene/mockSceneStream";
 import { TheaterCanvas } from "./TheaterCanvas";
 import { LiveTicker } from "./LiveTicker";
 import { StoryFocusBar } from "./StoryFocusBar";
+import { LifeCards } from "./LifeCards";
 
 export interface TheaterViewProps {
   sessionId?: string;
   streamUrl?: string;
   useMock?: boolean;
   onRevealReady?: () => void;
+  onRevealComplete?: () => void;
+  onOpenTimeline?: (storyId: string) => void;
   onSkip?: () => void;
   reducedMotion?: boolean;
   className?: string;
@@ -23,6 +26,8 @@ export function TheaterView({
   streamUrl,
   useMock = false,
   onRevealReady,
+  onRevealComplete,
+  onOpenTimeline,
   onSkip,
   reducedMotion = false,
   className = "",
@@ -32,9 +37,11 @@ export function TheaterView({
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [serverFinished, setServerFinished] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
   const [isMobileTickerOpen, setIsMobileTickerOpen] = useState(false);
 
   const directorRef = useRef<TheaterDirector | null>(null);
+  const allLinesRef = useRef<string[]>([]);
 
   // Initialize Director & timer
   useEffect(() => {
@@ -44,6 +51,7 @@ export function TheaterView({
         setSceneState({ ...newState });
       },
       onRevealReady: () => {
+        setIsRevealed(true);
         onRevealReady?.();
       },
     });
@@ -81,6 +89,7 @@ export function TheaterView({
       });
 
       const unsubscribe = mockStream.subscribe((lines) => {
+        allLinesRef.current.push(...lines);
         director.ingestLines(lines);
       });
 
@@ -96,6 +105,7 @@ export function TheaterView({
         try {
           const payload = JSON.parse(event.data);
           if (Array.isArray(payload.lines) && payload.lines.length > 0) {
+            allLinesRef.current.push(...payload.lines);
             director.ingestLines(payload.lines);
           }
         } catch (err) {
@@ -119,12 +129,42 @@ export function TheaterView({
     }
   }, [sessionId, streamUrl, useMock]);
 
-  // Handle Skip action
+  // Handle Skip action (instant jump to reveal)
   const handleSkip = () => {
     if (!directorRef.current) return;
     setIsSkipping(true);
     directorRef.current.skip();
+    setIsRevealed(true);
     onSkip?.();
+  };
+
+  // Handle offline / zero-network Replay of the theater
+  const handleReplayTheater = () => {
+    setIsRevealed(false);
+    setIsSkipping(false);
+    setElapsedSeconds(0);
+    setServerFinished(false);
+
+    if (directorRef.current) {
+      directorRef.current.destroy();
+    }
+
+    const director = new TheaterDirector({
+      reducedMotion,
+      onStateChange: (newState) => {
+        setSceneState({ ...newState });
+      },
+      onRevealReady: () => {
+        setIsRevealed(true);
+        onRevealReady?.();
+      },
+    });
+
+    directorRef.current = director;
+
+    if (allLinesRef.current.length > 0) {
+      director.ingestLines([...allLinesRef.current]);
+    }
   };
 
   // Calculate current Quarter and Month
@@ -227,70 +267,84 @@ export function TheaterView({
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col lg:flex-row gap-4 p-4 min-h-0 overflow-hidden">
-        {/* Left 70%: Stage (Story Focus Bar + Canvas) */}
-        <section
-          className="flex-1 lg:w-[70%] flex flex-col gap-3 min-h-[460px] relative"
-          aria-label="Simulation Theater Visual Stage"
-        >
-          {/* Focus Bar */}
-          <StoryFocusBar
-            stories={sceneState.stories}
-            focusedStoryId={focusedStoryId}
-            onFocusChange={setFocusedStoryId}
-          />
-
-          {/* Canvas Wrapper */}
-          <div className="flex-1 relative rounded-xl overflow-hidden min-h-[380px]">
-            <TheaterCanvas
-              sceneState={sceneState}
+      <main className="flex-1 flex flex-col gap-4 p-4 min-h-0 overflow-y-auto">
+        <div className="flex flex-col lg:flex-row gap-4 min-h-[460px]">
+          {/* Left 70%: Stage (Story Focus Bar + Canvas) */}
+          <section
+            className="flex-1 lg:w-[70%] flex flex-col gap-3 min-h-[460px] relative"
+            aria-label="Simulation Theater Visual Stage"
+          >
+            {/* Focus Bar */}
+            <StoryFocusBar
+              stories={sceneState.stories}
               focusedStoryId={focusedStoryId}
               onFocusChange={setFocusedStoryId}
             />
-          </div>
-        </section>
 
-        {/* Right 30%: Live Ticker (Desktop) */}
-        <section
-          className="hidden lg:flex lg:w-[30%] min-w-[320px] flex-col"
-          aria-label="Live Simulation Ticker"
-        >
-          <LiveTicker
-            ticker={sceneState.ticker}
-            focusedStoryId={focusedStoryId}
-            onFocusStory={setFocusedStoryId}
-            className="h-full"
-          />
-        </section>
+            {/* Canvas Wrapper */}
+            <div className="flex-1 relative rounded-xl overflow-hidden min-h-[380px]">
+              <TheaterCanvas
+                sceneState={sceneState}
+                focusedStoryId={focusedStoryId}
+                onFocusChange={setFocusedStoryId}
+              />
+            </div>
+          </section>
 
-        {/* Mobile Live Ticker Bottom Sheet (< 1024px) */}
-        <section
-          className={`lg:hidden flex flex-col bg-slate-900 border-t border-slate-800 transition-all duration-300 ${
-            isMobileTickerOpen ? "h-[360px]" : "h-[96px]"
-          }`}
-          aria-label="Mobile Live Ticker Drawer"
-        >
-          <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-slate-900/90">
-            <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-              Live Ticker
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsMobileTickerOpen(!isMobileTickerOpen)}
-              className="text-xs text-cyan-400 hover:text-cyan-300 px-2 py-0.5 rounded bg-slate-800"
-            >
-              {isMobileTickerOpen ? "Collapse ↓" : "Expand ↑"}
-            </button>
-          </div>
-          <div className="flex-1 overflow-hidden">
+          {/* Right 30%: Live Ticker (Desktop) */}
+          <section
+            className="hidden lg:flex lg:w-[30%] min-w-[320px] flex-col"
+            aria-label="Live Simulation Ticker"
+          >
             <LiveTicker
               ticker={sceneState.ticker}
               focusedStoryId={focusedStoryId}
               onFocusStory={setFocusedStoryId}
-              className="h-full border-0 rounded-none bg-transparent"
+              className="h-full"
+            />
+          </section>
+
+          {/* Mobile Live Ticker Bottom Sheet (< 1024px) */}
+          <section
+            className={`lg:hidden flex flex-col bg-slate-900 border-t border-slate-800 transition-all duration-300 ${
+              isMobileTickerOpen ? "h-[360px]" : "h-[96px]"
+            }`}
+            aria-label="Mobile Live Ticker Drawer"
+          >
+            <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-slate-900/90">
+              <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Live Ticker
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsMobileTickerOpen(!isMobileTickerOpen)}
+                className="text-xs text-cyan-400 hover:text-cyan-300 px-2 py-0.5 rounded bg-slate-800"
+              >
+                {isMobileTickerOpen ? "Collapse ↓" : "Expand ↑"}
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <LiveTicker
+                ticker={sceneState.ticker}
+                focusedStoryId={focusedStoryId}
+                onFocusStory={setFocusedStoryId}
+                className="h-full border-0 rounded-none bg-transparent"
+              />
+            </div>
+          </section>
+        </div>
+
+        {/* Revealed 4 Life Cards Panel (Section 10) */}
+        {isRevealed && (
+          <div className="w-full transition-all duration-700 animate-in fade-in slide-in-from-bottom-8 pt-2">
+            <LifeCards
+              stories={sceneState.stories}
+              onOpenTimeline={onOpenTimeline}
+              onCompareAll={onRevealComplete}
+              onReplayTheater={handleReplayTheater}
             />
           </div>
-        </section>
+        )}
       </main>
 
       {/* Safety Footer Line (Rule 7, Section 11) */}

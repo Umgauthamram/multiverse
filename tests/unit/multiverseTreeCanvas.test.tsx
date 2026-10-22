@@ -108,5 +108,54 @@ describe("Phase 22: 2D HTML5 Canvas Branching Tree Visualizer", () => {
       // Strict Anti-AI-Slop compliance assertion
       assertAntiSlopCompliance(html);
     });
+
+    it("renders 4 canonical branches (S1 to S4: 2 in Option A, 2 in Option B) seamlessly", () => {
+      const canonical4Branches: TimelineTreeBranch[] = [
+        {
+          timelineId: "S1",
+          branchOption: "A",
+          branchName: "London AI Startup",
+          personaSeed: "bold",
+          status: "thriving",
+          nodes: [{ quarter: 1, month: 3, status: "thriving" }],
+        },
+        {
+          timelineId: "S2",
+          branchOption: "A",
+          branchName: "London AI Startup",
+          personaSeed: "anxious",
+          status: "struggling",
+          nodes: [{ quarter: 1, month: 3, status: "struggling" }],
+        },
+        {
+          timelineId: "S3",
+          branchOption: "B",
+          branchName: "Delhi Corporate Lead",
+          personaSeed: "balanced",
+          status: "thriving",
+          nodes: [{ quarter: 1, month: 3, status: "thriving" }],
+        },
+        {
+          timelineId: "S4",
+          branchOption: "B",
+          branchName: "Delhi Corporate Lead",
+          personaSeed: "workaholic",
+          status: "plateau",
+          nodes: [{ quarter: 1, month: 3, status: "plateau" }],
+        },
+      ];
+
+      const html = renderToString(
+        <MultiverseTreeCanvas
+          branches={canonical4Branches}
+          scrubberMonth={60}
+          selectedTimelineId="S1"
+        />
+      );
+
+      expect(html).toContain('data-testid="multiverse-tree-container"');
+      expect(html).toContain('data-testid="multiverse-tree-canvas"');
+      assertAntiSlopCompliance(html);
+    });
   });
 });

@@ -3,6 +3,13 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { IntakeForm } from "@/components/intake/IntakeForm";
 import { IntakeFormValues, DEFAULT_INTAKE_VALUES } from "@/lib/schemas/intake";
+import { TheaterView } from "@/components/theater/TheaterView";
+import { CrisisDialog } from "@/components/safety/CrisisDialog";
+import {
+  evaluateIntakeSafety,
+  CrisisCategory,
+  CrisisHelpline,
+} from "@/lib/safety/crisisInterceptor";
 import { MultiverseTreeCanvas } from "@/components/tree/MultiverseTreeCanvas";
 import { TimeScrubber } from "@/components/tree/TimeScrubber";
 import {
@@ -17,12 +24,20 @@ import {
 import { TimelineStepDocument } from "@/lib/db/models/Simulation";
 import { PersonaSeedType } from "@/lib/simulation/personaSeeder";
 
-type AppViewMode = "welcome" | "intake" | "multiverse" | "finale";
+type AppViewMode = "welcome" | "intake" | "theater" | "multiverse" | "finale";
 
 export default function Home() {
   const [viewMode, setViewMode] = useState<AppViewMode>("welcome");
   const [intakeData, setIntakeData] = useState<IntakeFormValues>(DEFAULT_INTAKE_VALUES);
   const [simData, setSimData] = useState<SimulatedMultiverseData | null>(null);
+  const [sessionId, setSessionId] = useState<string>("sim-live");
+  const [useMockStream, setUseMockStream] = useState<boolean>(false);
+  const [crisisInfo, setCrisisInfo] = useState<{
+    isOpen: boolean;
+    category?: CrisisCategory;
+    matchedPattern?: string;
+    helplines?: CrisisHelpline[];
+  }>({ isOpen: false });
 
   // Time scrubber state
   const [scrubberMonth, setScrubberMonth] = useState<number>(60);
@@ -53,12 +68,61 @@ export default function Home() {
   }, [isPlaying, playbackSpeed, viewMode]);
 
   // Handle successful intake submission
-  const handleIntakeSubmit = useCallback((values: IntakeFormValues) => {
+  const handleIntakeSubmit = useCallback(async (values: IntakeFormValues) => {
     setIntakeData(values);
-    const generated = generateSimulatedMultiverse(values);
+
+    // 1. Guardrail safety inspection before starting simulation
+    const safetyCheck = evaluateIntakeSafety(values);
+    if (safetyCheck.isCrisis) {
+      setCrisisInfo({
+        isOpen: true,
+        category: safetyCheck.category,
+        matchedPattern: safetyCheck.matchedPattern,
+        helplines: safetyCheck.helplines,
+      });
+      return;
+    }
+
+    // 2. Request backend start endpoint
+    let sessId = `sim_local_${Date.now()}`;
+    let isMock = false;
+
+    try {
+      const res = await fetch("/api/simulate/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.crisis?.isCrisis) {
+          setCrisisInfo({
+            isOpen: true,
+            category: data.crisis.category,
+            matchedPattern: data.crisis.matchedPattern,
+            helplines: data.crisis.helplines,
+          });
+          return;
+        }
+        if (data.sessionId) {
+          sessId = data.sessionId;
+        } else {
+          isMock = true;
+        }
+      } else {
+        isMock = true;
+      }
+    } catch {
+      isMock = true;
+    }
+
+    setSessionId(sessId);
+    setUseMockStream(isMock);
+    const generated = generateSimulatedMultiverse(values, 4);
     setSimData(generated);
     setScrubberMonth(60);
-    setViewMode("multiverse");
+    setViewMode("theater");
   }, []);
 
   // Handle preset quick-start
@@ -108,11 +172,7 @@ export default function Home() {
       };
     }
 
-    setIntakeData(preset);
-    const generated = generateSimulatedMultiverse(preset);
-    setSimData(generated);
-    setScrubberMonth(60);
-    setViewMode("multiverse");
+    handleIntakeSubmit(preset);
   };
 
   // Convert simData steps into TimelineStepDocument format for BranchDetailDrawer
@@ -211,6 +271,16 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-2">
+          {viewMode === "theater" && (
+            <button
+              type="button"
+              onClick={() => setViewMode("multiverse")}
+              className="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 transition"
+            >
+              Skip to Tree Canvas →
+            </button>
+          )}
+
           {viewMode === "multiverse" && (
             <button
               type="button"
@@ -246,8 +316,10 @@ export default function Home() {
               ? "Phase 30: Ready"
               : viewMode === "intake"
               ? "Profiler Active"
+              : viewMode === "theater"
+              ? "Live Multiverse Theater"
               : viewMode === "multiverse"
-              ? "12 Parallel Timelines"
+              ? "4 Parallel Timelines"
               : "Finale Synthesis"}
           </div>
         </div>
@@ -261,13 +333,13 @@ export default function Home() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-zinc-800 bg-zinc-900/60 text-xs text-zinc-400 w-fit">
               <span>Counterfactual Reflection Engine</span>
               <span className="text-zinc-600">•</span>
-              <span>12 Divergent Branches</span>
+              <span>4 Divergent Branches</span>
               <span className="text-zinc-600">•</span>
               <span>5-Year Horizon</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-zinc-100 leading-tight">
-              Fork a single real-world decision into 12 parallel simulated futures.
+              Fork a single real-world decision into 4 parallel simulated futures.
             </h1>
 
             <p className="text-zinc-300 text-base md:text-lg leading-relaxed">
@@ -314,16 +386,16 @@ export default function Home() {
               </div>
 
               <div className="p-4 rounded-lg bg-zinc-900/40 border border-zinc-800/80 flex flex-col gap-1.5">
-                <span className="text-xs font-semibold text-zinc-200">12 Parallel Personas</span>
+                <span className="text-xs font-semibold text-zinc-200">4 Parallel Personas</span>
                 <p className="text-[11px] text-zinc-400 leading-relaxed">
-                  Bold, Anxious, Workaholic, Balanced, Pragmatist, and Burnout Risk archetypes fork across both options.
+                  Bold, Anxious, Balanced, and Workaholic archetypes fork across both options.
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-zinc-900/40 border border-zinc-800/80 flex flex-col gap-1.5">
                 <span className="text-xs font-semibold text-zinc-200">Long-Context Synthesis</span>
                 <p className="text-[11px] text-zinc-400 leading-relaxed">
-                  Gemini 2.5 Flash digests 240 simulation steps into ranked futures, regret hotspots, and divergence moments.
+                  Gemini 2.5 Flash digests 80 simulation steps into ranked futures, regret hotspots, and divergence moments.
                 </p>
               </div>
             </div>
@@ -346,7 +418,26 @@ export default function Home() {
           </section>
         )}
 
-        {/* VIEW 3: Interactive Multiverse Tree Canvas HUD */}
+        {/* VIEW 3: Multiverse Theater Live Simulation Stage */}
+        {viewMode === "theater" && (
+          <section className="py-2 w-full" data-testid="theater-stage-section">
+            <TheaterView
+              sessionId={sessionId}
+              useMock={useMockStream}
+              onRevealComplete={() => {
+                setViewMode("multiverse");
+              }}
+              onOpenTimeline={(storyId) => {
+                setSelectedTimelineId(storyId);
+                setSelectedQuarter(20);
+                setIsDrawerOpen(true);
+                setViewMode("multiverse");
+              }}
+            />
+          </section>
+        )}
+
+        {/* VIEW 4: Interactive Multiverse Tree Canvas HUD */}
         {viewMode === "multiverse" && simData && (
           <section className="flex flex-col gap-5 w-full">
             {/* Multiverse HUD Strip */}
@@ -354,7 +445,7 @@ export default function Home() {
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    Simulating 12 Realities:
+                    Simulating {simData.timelines.length} Realities:
                   </span>
                   <span className="text-xs font-bold text-zinc-200">&ldquo;{intakeData.decisionPrompt}&rdquo;</span>
                 </div>
@@ -443,6 +534,15 @@ export default function Home() {
         <div>Typography: Poppins • Palette: Warm Slate • Stack: Next.js 16, TypeScript, Tailwind CSS v4</div>
         <div className="font-mono">Multiverse You • Anti-AI-Slop Certified Engine</div>
       </footer>
+
+      {/* Safety Crisis Intervention Guardrail Modal */}
+      <CrisisDialog
+        isOpen={crisisInfo.isOpen}
+        onClose={() => setCrisisInfo({ isOpen: false })}
+        category={crisisInfo.category}
+        matchedPattern={crisisInfo.matchedPattern}
+        helplines={crisisInfo.helplines}
+      />
     </main>
   );
 }

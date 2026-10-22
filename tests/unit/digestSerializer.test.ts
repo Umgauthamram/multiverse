@@ -248,5 +248,29 @@ describe("Phase 26: Dense Digest Serializer for Gemini Synthesis", () => {
       // Verify Anti-AI-Slop compliance on generated markdown
       assertAntiSlopCompliance(result.markdown);
     });
+
+    it("serializes 4 canonical timelines into a dense digest with 4-Timeline Comparative Matrix", () => {
+      const canonical4 = [
+        generateMockTimeline(1, "A", "bold"),
+        generateMockTimeline(2, "A", "anxious"),
+        generateMockTimeline(3, "B", "balanced"),
+        generateMockTimeline(4, "B", "workaholic"),
+      ];
+
+      const input: SimulationDigestInput = {
+        sessionId: "sess-4-test",
+        decisionPrompt: "London AI Startup vs Delhi Corporate Lead",
+        optionA: { name: "London AI Startup", location: "London, UK" },
+        optionB: { name: "Delhi Corporate Lead", location: "Delhi, India" },
+        timelines: canonical4,
+      };
+
+      const result = serializeSimulationDigest(input);
+
+      expect(result.timelineCount).toBe(4);
+      expect(result.markdown).toContain("4-Timeline Comparative Matrix");
+      expect(result.isUnderBudget).toBe(true);
+      assertAntiSlopCompliance(result.markdown);
+    });
   });
 });

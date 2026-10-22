@@ -12,6 +12,7 @@ import {
   PersonaSeedType,
   PERSONA_PROFILES,
 } from "@/lib/simulation/personaSeeder";
+import { generateStorySeeds } from "@/lib/scene/storySeeds";
 import { rollQuarterEvent } from "@/lib/simulation/eventRoller";
 import { calculateQuarterFinance } from "@/lib/simulation/financeEngine";
 import { applyAndClampStats, LifeStats } from "@/lib/simulation/statClamper";
@@ -30,6 +31,8 @@ import {
   FinaleStepInput,
 } from "@/components/finale/FinaleReportView";
 
+export const STORY_COUNT = 4;
+
 export interface SimulatedMultiverseData {
   branches: TimelineTreeBranch[];
   timelines: FinaleTimelineInput[];
@@ -38,15 +41,19 @@ export interface SimulatedMultiverseData {
 }
 
 export function generateSimulatedMultiverse(
-  intake: IntakeFormValues
+  intake: IntakeFormValues,
+  storyCount: number = STORY_COUNT
 ): SimulatedMultiverseData {
-  const seeds = generate12TimelineSeeds({
-    sessionId: `sim-${Date.now()}`,
-    optionA: intake.optionA,
-    optionB: intake.optionB,
-    liquidSavings: intake.liquidSavings,
-    monthlyBurn: intake.monthlyBurn,
-  });
+  const seeds =
+    storyCount === 4
+      ? generateStorySeeds(intake, 4)
+      : generate12TimelineSeeds({
+          sessionId: `sim-${Date.now()}`,
+          optionA: intake.optionA,
+          optionB: intake.optionB,
+          liquidSavings: intake.liquidSavings,
+          monthlyBurn: intake.monthlyBurn,
+        });
 
   const branches: TimelineTreeBranch[] = [];
   const timelines: FinaleTimelineInput[] = [];
@@ -201,35 +208,25 @@ export function generateSimulatedMultiverse(
 
   scored.sort((a, b) => b.score - a.score);
 
-  const rankedFutures: RankedFuture[] = [
-    {
-      rank: 1,
-      timelineId: scored[0].timeline.timelineId,
-      path: scored[0].timeline.branchOption,
-      personaSeed: scored[0].timeline.personaSeed,
-      score: scored[0].score,
-      headline: `Optimal Synthesis: ${scored[0].timeline.branchName}`,
-      tradeoffSummary: `Balanced psychological health (${scored[0].timeline.finalStats?.happiness}) with robust compounding reserves ($${Math.round(scored[0].timeline.finalSavings ?? 0).toLocaleString()}).`,
-    },
-    {
-      rank: 2,
-      timelineId: scored[1].timeline.timelineId,
-      path: scored[1].timeline.branchOption,
-      personaSeed: scored[1].timeline.personaSeed,
-      score: scored[1].score,
-      headline: `Resilient Autonomy: ${scored[1].timeline.branchName}`,
-      tradeoffSummary: `Consistently avoided structural burnout shocks and protected community bonds.`,
-    },
-    {
-      rank: 3,
-      timelineId: scored[2].timeline.timelineId,
-      path: scored[2].timeline.branchOption,
-      personaSeed: scored[2].timeline.personaSeed,
-      score: scored[2].score,
-      headline: `High-Altitude Compromise: ${scored[2].timeline.branchName}`,
-      tradeoffSummary: `Maximized professional trajectory while navigating occasional stress plateaus.`,
-    },
-  ];
+  const rankedFutures: RankedFuture[] = scored.slice(0, 3).map((item, idx) => ({
+    rank: idx + 1,
+    timelineId: item.timeline.timelineId,
+    path: item.timeline.branchOption,
+    personaSeed: item.timeline.personaSeed,
+    score: item.score,
+    headline:
+      idx === 0
+        ? `Optimal Synthesis: ${item.timeline.branchName}`
+        : idx === 1
+        ? `Resilient Autonomy: ${item.timeline.branchName}`
+        : `High-Altitude Compromise: ${item.timeline.branchName}`,
+    tradeoffSummary:
+      idx === 0
+        ? `Balanced psychological health (${item.timeline.finalStats?.happiness}) with robust compounding reserves ($${Math.round(item.timeline.finalSavings ?? 0).toLocaleString()}).`
+        : idx === 1
+        ? `Consistently avoided structural burnout shocks and protected community bonds.`
+        : `Maximized professional trajectory while navigating occasional stress plateaus.`,
+  }));
 
   const pivotalDivergences: PivotalDivergence[] = [
     {
