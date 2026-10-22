@@ -29,6 +29,7 @@ import {
 import {
   AGENT_OFFICE,
   LIFE_WING_ROOMS,
+  resolveWindowView,
 } from "@/lib/theater/layout";
 import {
   createWalker,
@@ -55,13 +56,16 @@ import {
   drawCardboardBox,
   drawChair,
   drawDesk,
+  drawFloatingTextPop,
   drawKitchenCounter,
   drawPlant,
   drawReceptionDesk,
   drawServerRack,
   drawSofa,
+  drawWallCalendar,
   drawWallPhotoFrame,
   drawWaterCooler,
+  drawWindowWithSkyline,
 } from "@/lib/theater/sprites/props";
 import {
   AGENT_ROSTER_INFO,
@@ -71,6 +75,17 @@ import {
 
 interface RenderEntity extends DepthSortable {
   draw: (ctx: CanvasRenderingContext2D) => void;
+}
+
+export interface TextPop {
+  id: string;
+  storyId: string;
+  text: string;
+  color: string;
+  pixelX: number;
+  pixelY: number;
+  progress: number; // 0.0 to 1.0
+  durationMs: number;
 }
 
 export class TheaterRenderer {
@@ -109,6 +124,15 @@ export class TheaterRenderer {
   private nexusWalker: WalkerState | null = null;
   private lastForkedStoriesCount = 0;
   private nexusWalkPhase: "idle" | "to_stairs" | "to_reception" | "to_corridor" = "idle";
+
+  // Life Wing Cast Walkers & Room State Trackers
+  private castWalkers: Record<
+    string,
+    (WalkerState & { role: string; phase: "entering" | "interacting" | "exiting" | "gone" }) | null
+  > = {};
+  private textPops: TextPop[] = [];
+  private lastSavings: Record<string, number> = {};
+  private lastClampedHits: Record<string, string> = {};
 
   // Handoff packet animation state
   private handoffProgress = 0;
@@ -279,6 +303,100 @@ export class TheaterRenderer {
       this.currentHandoffKey = null;
       this.handoffProgress = 0;
     }
+
+    // 6. Life Wing State Reactions: Cash Delta & Stat Clamping Text Pops
+    if (state?.stories) {
+      for (const [storyId, story] of Object.entries(state.stories)) {
+        const prevSavings = this.lastSavings[storyId];
+        if (prevSavings !== undefined && story.currentSavings !== prevSavings) {
+          const diff = Math.round(story.currentSavings - prevSavings);
+          if (Math.abs(diff) > 0) {
+            const text = diff > 0 ? `+$${diff.toLocaleString()}` : `-$${Math.abs(diff).toLocaleString()}`;
+            const color = diff > 0 ? "#10b981" : "#f43f5e";
+            const walker = this.youWalkers[storyId];
+            const px = walker ? walker.currentPixel.x : 0;
+            const py = walker ? walker.currentPixel.y - 30 : 0;
+
+            this.textPops.push({
+              id: `pop_${Date.now()}_${Math.random()}`,
+              storyId,
+              text,
+              color,
+              pixelX: px,
+              pixelY: py,
+              progress: 0,
+              durationMs: 1200,
+            });
+          }
+        }
+        this.lastSavings[storyId] = story.currentSavings;
+
+        // Stat clamp hit detection (BURNOUT or MAX STAT)
+        const prevHit = this.lastClampedHits[storyId];
+        if (story.clampedHit && story.clampedHit !== "none" && story.clampedHit !== prevHit) {
+          const hitLabel = story.clampedHit === "hp" ? "BURNOUT HIT!" : `MAX ${story.clampedHit.toUpperCase()}!`;
+          const color = story.clampedHit === "hp" ? "#f43f5e" : "#f59e0b";
+          const walker = this.youWalkers[storyId];
+          const px = walker ? walker.currentPixel.x : 0;
+          const py = walker ? walker.currentPixel.y - 48 : 0;
+
+          this.textPops.push({
+            id: `hit_${Date.now()}_${Math.random()}`,
+            storyId,
+            text: hitLabel,
+            color,
+            pixelX: px,
+            pixelY: py,
+            progress: 0,
+            durationMs: 1400,
+          });
+        }
+        this.lastClampedHits[storyId] = story.clampedHit || "none";
+      }
+    }
+
+    // Advance floating text pops
+    for (const pop of this.textPops) {
+      pop.progress += dt / pop.durationMs;
+    }
+    this.textPops = this.textPops.filter((p) => p.progress < 1.0);
+
+    // 7. Cast NPCs Lifecycle & Pathing
+    if (state?.cast) {
+      const activeRoles = Object.keys(state.cast);
+      for (const [storyId, room] of Object.entries(LIFE_WING_ROOMS)) {
+        let castWalker = this.castWalkers[storyId];
+
+        if (!castWalker && activeRoles.length > 0) {
+          const role = activeRoles[0];
+          const newWalker = createWalker(room.anchors.door);
+          castWalker = {
+            ...newWalker,
+            role,
+            phase: "entering",
+          };
+          setWalkerDestination(castWalker, room.anchors.visitor_1);
+          this.castWalkers[storyId] = castWalker;
+        }
+
+        if (castWalker) {
+          updateWalker(castWalker, dt);
+
+          if (castWalker.phase === "entering" && !castWalker.isMoving) {
+            castWalker.phase = "interacting";
+          } else if (castWalker.phase === "interacting") {
+            const story = state?.stories[storyId];
+            if (story?.finished) {
+              castWalker.phase = "exiting";
+              setWalkerDestination(castWalker, room.anchors.door);
+            }
+          } else if (castWalker.phase === "exiting" && !castWalker.isMoving) {
+            castWalker.phase = "gone";
+            this.castWalkers[storyId] = null;
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -329,9 +447,14 @@ export class TheaterRenderer {
     // 5. Draw room information banners
     this.drawRoomBanners(ctx, state);
 
+    // 6. Draw active floating text pops (cash deltas and stat hits)
+    for (const pop of this.textPops) {
+      drawFloatingTextPop(ctx, pop.pixelX, pop.pixelY, pop.text, pop.color, pop.progress);
+    }
+
     ctx.restore(); // Restore Camera Transform
 
-    // 6. Draw overlay / HUD elements (if any)
+    // 7. Draw overlay / HUD elements (if any)
     this.drawHUD(ctx);
 
     ctx.restore(); // Restore DPR scaling
@@ -700,7 +823,7 @@ export class TheaterRenderer {
     for (const [storyId, room] of Object.entries(LIFE_WING_ROOMS)) {
       const storyState = state?.stories[storyId];
 
-      // Desk & Chair
+      // Desk & Chair with career tiers, pill bottle, and coffee
       const deskPt = room.anchors.desk;
       const deskScr = gridToScreen(deskPt.col, deskPt.row, 0);
       entities.push({
@@ -710,8 +833,33 @@ export class TheaterRenderer {
         sortOrderOffset: 0,
         draw: (c) => {
           drawChair(c, deskScr.x, deskScr.y - 6);
-          drawDesk(c, deskScr.x, deskScr.y + 12, THEATER_PALETTE.furnitureLight);
+          drawDesk(
+            c,
+            deskScr.x,
+            deskScr.y + 12,
+            THEATER_PALETTE.furnitureLight,
+            undefined,
+            null,
+            {
+              careerTier: storyState?.careerDeskTier ?? 1,
+              hasPillBottle: (storyState?.stats.health ?? 50) < 35,
+              coffeeCups: storyState?.personaSeed === "workaholic" ? 2 : 0,
+            }
+          );
         },
+      });
+
+      // Window with city skyline silhouette
+      const winPt = room.anchors.window;
+      const winScr = gridToScreen(winPt.col, winPt.row, 0);
+      const city = resolveWindowView(storyState?.location || "");
+      const isDim = (storyState?.stats.happiness ?? 50) < 35;
+      entities.push({
+        level: 0,
+        col: winPt.col,
+        row: winPt.row,
+        sortOrderOffset: -1,
+        draw: (c) => drawWindowWithSkyline(c, winScr.x, winScr.y - 8, city, isDim),
       });
 
       // Sofa
@@ -737,6 +885,15 @@ export class TheaterRenderer {
         draw: (c) => drawBookshelf(c, shelfScr.x, shelfScr.y + 16, coinTier),
       });
 
+      // Wall calendar
+      entities.push({
+        level: 0,
+        col: shelfPt.col,
+        row: shelfPt.row,
+        sortOrderOffset: 0,
+        draw: (c) => drawWallCalendar(c, shelfScr.x + 14, shelfScr.y - 18, storyState?.quarter || 1),
+      });
+
       // Kitchen Counter
       const kitPt = room.anchors.kitchen;
       const kitScr = gridToScreen(kitPt.col, kitPt.row, 0);
@@ -748,10 +905,8 @@ export class TheaterRenderer {
         draw: (c) => drawKitchenCounter(c, kitScr.x, kitScr.y + 12),
       });
 
-      // Plant
+      // Plant (alive when happiness >= 35, wilted when sad/burnout)
       const plantIsAlive = (storyState?.stats.happiness ?? 50) >= 35;
-      const winPt = room.anchors.window;
-      const winScr = gridToScreen(winPt.col, winPt.row, 0);
       entities.push({
         level: 0,
         col: winPt.col,
@@ -823,33 +978,30 @@ export class TheaterRenderer {
         });
       }
 
-      // Cast NPCs
-      if (state?.cast) {
-        const activeCastList = Object.values(state.cast);
-        if (activeCastList.length > 0) {
-          const npc = activeCastList[0];
-          const npcLook = createCastLookSpec(npc.role);
-          const v1Pt = room.anchors.visitor_1;
-          const v1Scr = gridToScreen(v1Pt.col, v1Pt.row, 0);
+      // Cast NPCs (dynamic lifecycle walker)
+      const castWalker = this.castWalkers[storyId];
+      if (castWalker && castWalker.phase !== "gone") {
+        const npcLook = createCastLookSpec(castWalker.role);
+        const curCoord = castWalker.path[castWalker.currentIndex] || room.anchors.visitor_1;
+        const anim: AnimationName = castWalker.isMoving ? "walk" : "talk";
 
-          entities.push({
-            level: 0,
-            col: v1Pt.col,
-            row: v1Pt.row,
-            sortOrderOffset: 2,
-            draw: (c) => {
-              drawCharacterFrame(
-                c,
-                npcLook,
-                "talk",
-                this.currentAnimFrame,
-                -1,
-                v1Scr.x - 16,
-                v1Scr.y - 12
-              );
-            },
-          });
-        }
+        entities.push({
+          level: 0,
+          col: curCoord.col,
+          row: curCoord.row,
+          sortOrderOffset: 2,
+          draw: (c) => {
+            drawCharacterFrame(
+              c,
+              npcLook,
+              anim,
+              this.currentAnimFrame,
+              castWalker.facing,
+              castWalker.currentPixel.x - 16,
+              castWalker.currentPixel.y - 12
+            );
+          },
+        });
       }
     }
   }

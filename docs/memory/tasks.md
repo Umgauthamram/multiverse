@@ -47,12 +47,13 @@
 - [x] Theater Phase 4: Renderer core: iso projection, floors/walls, sprite atlas, character generator, pathfinding (`src/lib/theater/tokens.ts`, `iso.ts`, `layout.ts`, `pathfinding.ts`, `sprites/characterGenerator.ts`, `sprites/props.ts`, `renderer.ts`, tests: `layout.test.ts`, `pathfinding.test.ts`, `rendererSmoke.test.ts`)
 
 - [x] Theater Phase 5: Agent Office: 9 agents, 9 monitor textures, status tags, handoff packets, NEXUS walk (`src/lib/theater/sprites/screens.ts`, `renderer.ts`, `props.ts`, tests: `screens.test.ts`, `agentOffice.test.ts`)
+- [x] Theater Phase 6: Life Wing: 4 rooms, state visuals, event scenes, cast NPCs, text pops (`src/lib/theater/sprites/props.ts`, `renderer.ts`, tests: `lifeWing.test.ts`)
+- [x] Theater Phase 7: `TheaterView`, `LiveTicker`, focus camera, Skip, mobile layout, a11y (`src/components/theater/`, tests: `theaterUI.test.tsx`)
 
 ## Active Tasks
-- [ ] Theater Phase 6: Life Wing: 4 rooms, state visuals, event scenes, cast NPCs, text pops
+- [ ] Theater Phase 8: Reveal, Life Cards, page flow, 4-timeline tree and finale
 
 ## Backlog (Upcoming Theater Phases)
-- [ ] Theater Phase 7: `TheaterView`, `LiveTicker`, focus camera, Skip, mobile layout, a11y
 - [ ] Theater Phase 8: Reveal, Life Cards, page flow, 4-timeline tree and finale
 - [ ] Theater Phase 9: Perf, reduced motion, failure scenes, `?demo=1` scenarios
 - [ ] Theater Phase 10: ADR, constraints amendment, memory docs, README section

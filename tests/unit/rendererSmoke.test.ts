@@ -19,6 +19,7 @@ function createMockCanvas(): HTMLCanvasElement {
     translate: vi.fn(),
     arc: vi.fn(),
     ellipse: vi.fn(),
+    rect: vi.fn(),
     roundRect: vi.fn(),
     drawImage: vi.fn(),
     measureText: vi.fn().mockReturnValue({ width: 40 }),

@@ -185,7 +185,11 @@ export function drawCharacterFrame(
   // Subtle highlight shape on top-left of head
   ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
   ctx.beginPath();
-  ctx.ellipse(-3, headCenterY - 4, 4, 2, -Math.PI / 4, 0, Math.PI * 2);
+  if (typeof ctx.ellipse === "function") {
+    ctx.ellipse(-3, headCenterY - 4, 4, 2, -Math.PI / 4, 0, Math.PI * 2);
+  } else {
+    ctx.arc(-3, headCenterY - 4, 2, 0, Math.PI * 2);
+  }
   ctx.fill();
 
   // Hair

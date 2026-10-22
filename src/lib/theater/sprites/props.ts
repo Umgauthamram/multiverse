@@ -14,6 +14,44 @@ const OUTLINE = THEATER_PALETTE.outline;
 const FURNITURE_DARK = THEATER_PALETTE.furnitureDark;
 const FURNITURE_LIGHT = THEATER_PALETTE.furnitureLight;
 
+function safeEllipse(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  rx: number,
+  ry: number,
+  rotation = 0
+): void {
+  if (typeof ctx.ellipse === "function") {
+    ctx.ellipse(x, y, rx, ry, rotation, 0, Math.PI * 2);
+  } else {
+    ctx.save();
+    ctx.translate(x, y);
+    if (rotation !== 0) ctx.rotate(rotation);
+    ctx.scale(rx, ry);
+    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.restore();
+  }
+}
+
+function safeRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number
+): void {
+  if (typeof ctx.rect === "function") {
+    ctx.rect(x, y, w, h);
+  } else {
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+  }
+}
+
 /**
  * Draws an isometric office desk with monitor.
  * Centered at tile anchor (x, y).
@@ -24,7 +62,12 @@ export function drawDesk(
   y: number,
   accentColor: string = THEATER_PALETTE.trim,
   monitorData?: { label?: string; progress?: number; code?: string },
-  screenSource?: CanvasImageSource | null
+  screenSource?: CanvasImageSource | null,
+  options?: {
+    careerTier?: number;
+    hasPillBottle?: boolean;
+    coffeeCups?: number;
+  }
 ): void {
   ctx.save();
   ctx.translate(x, y);
@@ -101,6 +144,39 @@ export function drawDesk(
     }
   }
 
+  // Career setup accessories
+  const careerTier = options?.careerTier ?? 1;
+  if (careerTier >= 1) {
+    // Small notebook
+    ctx.fillStyle = "#fef08a";
+    ctx.fillRect(-18, 0, 7, 5);
+    ctx.strokeRect(-18, 0, 7, 5);
+  }
+  if (careerTier >= 3) {
+    // Award plaque on desk corner
+    ctx.fillStyle = "#f59e0b";
+    ctx.fillRect(16, -8, 5, 8);
+    ctx.strokeRect(16, -8, 5, 8);
+  }
+
+  // Health < 35 Pill bottle
+  if (options?.hasPillBottle) {
+    ctx.fillStyle = "#ea580c";
+    ctx.fillRect(-16, -6, 5, 7);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(-16, -8, 5, 3);
+    ctx.strokeRect(-16, -8, 5, 9);
+  }
+
+  // Coffee cups (for workaholic / tired)
+  const cups = options?.coffeeCups ?? 0;
+  for (let c = 0; c < Math.min(2, cups); c++) {
+    const cx = 10 + c * 6;
+    ctx.fillStyle = "#f8fafc";
+    ctx.fillRect(cx, 1, 4, 5);
+    ctx.strokeRect(cx, 1, 4, 5);
+  }
+
   ctx.restore();
 }
 
@@ -117,7 +193,7 @@ export function drawChair(ctx: CanvasRenderingContext2D, x: number, y: number): 
   // Seat
   ctx.fillStyle = "#334155";
   ctx.beginPath();
-  ctx.ellipse(0, 0, 10, 6, 0, 0, Math.PI * 2);
+  safeEllipse(ctx, 0, 0, 10, 6, 0);
   ctx.fill();
   ctx.stroke();
 
@@ -419,7 +495,7 @@ export function drawCoinStacks(
     for (let c = 0; c < heightCoins; c++) {
       const cy = -c * 2;
       ctx.beginPath();
-      ctx.ellipse(stackX, cy, 3, 1.5, 0, 0, Math.PI * 2);
+      safeEllipse(ctx, stackX, cy, 3, 1.5, 0);
       ctx.fill();
       ctx.stroke();
     }
@@ -507,20 +583,20 @@ export function drawPlant(ctx: CanvasRenderingContext2D, x: number, y: number, i
   if (isAlive) {
     ctx.fillStyle = "#15803d";
     ctx.beginPath();
-    ctx.ellipse(0, -8, 7, 10, 0, 0, Math.PI * 2);
+    safeEllipse(ctx, 0, -8, 7, 10, 0);
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = "#22c55e";
     ctx.beginPath();
-    ctx.ellipse(4, -6, 5, 7, Math.PI / 4, 0, Math.PI * 2);
+    safeEllipse(ctx, 4, -6, 5, 7, Math.PI / 4);
     ctx.fill();
     ctx.stroke();
   } else {
     // Wilted brownish leaves
     ctx.fillStyle = "#78350f";
     ctx.beginPath();
-    ctx.ellipse(3, -2, 6, 4, Math.PI / 3, 0, Math.PI * 2);
+    safeEllipse(ctx, 3, -2, 6, 4, Math.PI / 3);
     ctx.fill();
     ctx.stroke();
   }
@@ -583,6 +659,146 @@ export function drawWallPhotoFrame(
     ctx.fillStyle = "#be185d";
     ctx.fillRect(-2, -4, 4, 3);
   }
+
+  ctx.restore();
+}
+
+/**
+ * Draws room window with city skyline silhouette.
+ * Flat-color restrained silhouette in THEATER_PALETTE.skyline.
+ */
+export function drawWindowWithSkyline(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  city: "london" | "delhi" | "bengaluru" | "sf" | "generic" = "generic",
+  isDim = false
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = OUTLINE;
+
+  const skyColor = isDim ? "#1a2233" : "#22334d";
+  const silhouetteColor = isDim ? "#2b354b" : THEATER_PALETTE.skyline;
+
+  // Window frame & sky pane
+  ctx.fillStyle = skyColor;
+  ctx.fillRect(-20, -32, 40, 32);
+  ctx.strokeRect(-20, -32, 40, 32);
+
+  // City Skyline Silhouettes
+  ctx.fillStyle = silhouetteColor;
+  ctx.beginPath();
+  if (city === "london") {
+    safeRect(ctx, -16, -26, 6, 26); // Big Ben tower
+    safeRect(ctx, -17, -29, 8, 3);  // Spire base
+    safeRect(ctx, -8, -14, 12, 14); // Low-rise
+    ctx.arc(10, -12, 7, Math.PI, 0); // London Eye arch
+  } else if (city === "delhi") {
+    safeRect(ctx, -18, -12, 8, 12);
+    safeRect(ctx, -8, -22, 16, 22); // India Gate frame
+    safeRect(ctx, 10, -14, 8, 14);
+  } else if (city === "bengaluru") {
+    safeRect(ctx, -18, -16, 12, 16);
+    ctx.arc(-12, -16, 5, Math.PI, 0); // Vidhana Soudha dome
+    safeRect(ctx, -2, -26, 10, 26); // Modern IT tower
+    safeRect(ctx, 10, -20, 8, 20);
+  } else if (city === "sf") {
+    safeRect(ctx, -18, -28, 4, 28); // Bridge tower
+    safeRect(ctx, -12, -28, 4, 28);
+    // Transamerica pyramid
+    ctx.moveTo(8, -4);
+    ctx.lineTo(13, -28);
+    ctx.lineTo(18, -4);
+    ctx.closePath();
+  } else {
+    // Generic city towers
+    safeRect(ctx, -18, -20, 8, 20);
+    safeRect(ctx, -8, -28, 12, 28);
+    safeRect(ctx, 6, -22, 12, 22);
+  }
+  ctx.fill();
+
+  // Window mullions (cross panes)
+  ctx.strokeStyle = THEATER_PALETTE.trim;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, -32);
+  ctx.lineTo(0, 0);
+  ctx.moveTo(-20, -16);
+  ctx.lineTo(20, -16);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * Draws small wall calendar showing current simulation quarter.
+ */
+export function drawWallCalendar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  quarter = 1
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = OUTLINE;
+
+  // White calendar sheet
+  ctx.fillStyle = "#f8fafc";
+  ctx.fillRect(-6, -8, 12, 14);
+  ctx.strokeRect(-6, -8, 12, 14);
+
+  // Red header
+  ctx.fillStyle = "#ef4444";
+  ctx.fillRect(-6, -8, 12, 4);
+
+  // Quarter text
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "bold 6px sans-serif";
+  ctx.fillText(`Q${quarter}`, -4, 2);
+
+  ctx.restore();
+}
+
+/**
+ * Draws in-canvas floating text pop (cash delta or stat hit) drifting upward.
+ */
+export function drawFloatingTextPop(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  text: string,
+  color: string,
+  progress: number // 0.0 to 1.0
+): void {
+  ctx.save();
+  const offsetY = -progress * 26;
+  ctx.translate(x, y + offsetY);
+
+  const alpha = Math.max(0, 1.0 - progress * progress);
+  ctx.globalAlpha = alpha;
+
+  ctx.font = "bold 11px sans-serif";
+  const tw = ctx.measureText(text).width;
+
+  // Dark pill container for contrast
+  ctx.fillStyle = "rgba(11, 15, 25, 0.85)";
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(-tw / 2 - 5, -10, tw + 10, 17, 4);
+  ctx.fill();
+  ctx.stroke();
+
+  // Crisp text
+  ctx.fillStyle = color;
+  ctx.fillText(text, -tw / 2, 3);
 
   ctx.restore();
 }
