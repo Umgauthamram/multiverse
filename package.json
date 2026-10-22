@@ -19,7 +19,7 @@
     "@upstash/redis": "^1.39.0",
     "ai": "^7.0.137",
     "mongodb": "^7.7.0",
-    "next": "16.4.0",
+    "next": "^16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwindcss": "^4",
